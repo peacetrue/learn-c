@@ -67,6 +67,25 @@ gcc -c -o main.o main.s
 gcc -o main main.o
 ----
 
+== Make
+
+编写 Makefile 文件：
+
+[source%nowrap,bash,subs="specialchars,attributes"]
+----
+cd $workingDir/learn-c
+
+tee Makefile <<EOF
+include::example$Makefile[]
+EOF
+----
+
+集成 CLion：
+
+image::1.png[]
+
+NOTE: Makefile 中构建出支持调试模式的可执行文件，运行调试模式才能进入断点。
+
 == 调试
 
 [source%nowrap,bash,subs="specialchars,attributes"]
@@ -80,3 +99,4 @@ gdb main
 == 附录
 
 * https://stackoverflow.com/questions/10285410/what-are-s-files[What are .S files?^]
+* https://blog.csdn.net/dc_726/article/details/48978849[C实战：项目构建Make,Automake,CMake^]
