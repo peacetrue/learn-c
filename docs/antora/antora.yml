@@ -1,0 +1,12 @@
+name: learn-c
+title: 学习 C 语言
+version: master
+asciidoc:
+  attributes:
+    numbered: '@'
+    website: https://peacetrue.github.io
+    app-group: com.github.peacetrue
+    app-name: learn-c
+start_page: ROOT:index.adoc
+nav:
+  - modules/ROOT/nav.adoc
