@@ -71,10 +71,10 @@ gcc -o main main.o
 
 [source%nowrap,bash,subs="specialchars,attributes"]
 ----
-gcc -g main.c
+# 编译出一个调试版本的可执行文件
+gcc -g -o main main.c
 gdb main
-gcc -g -c -o main.o main.c
-gdb ./main.o
+# list break info next print
 ----
 
 == 附录

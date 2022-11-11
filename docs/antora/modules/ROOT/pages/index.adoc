@@ -16,7 +16,7 @@ image:https://snyk.io/test/github/peacetrue/{app-name}/badge.svg["Snyk",link="ht
 
 == 背景（Why）
 
-调试 Java 的时候，遇到 native 方法就会跳过，怎么做才能进入 native 方法内部呢？
+调试 Java 的时候，遇到 native 方法就会跳过，怎样进入 native 方法内部呢？
 需要编译出一个调试版本的 JDK，JDK 是基于 C 语言实现，所以需要对 C 语言有一定了解。
 
 == 用法（How）
