@@ -15,7 +15,7 @@ image::builder/theory-02.png[]
 
 [source%nowrap,bash,subs="specialchars,attributes"]
 ----
-# 当前在 source 目录下
+# 当前在 builder 目录下
 
 #团队A构建目标文件
 gcc -I team-a/src/main/public -c team-a/src/main/cpp/library.cpp
@@ -43,7 +43,7 @@ include::example$builder/Makefile[]
 
 [source%nowrap,bash,subs="specialchars,attributes"]
 ----
-# 当前在 source 目录下
+# 当前在 builder 目录下
 make application
 ./application
 ----
@@ -52,12 +52,12 @@ make application
 
 [source%nowrap,bash,subs="specialchars,attributes"]
 ----
-# 当前在 source 目录下
+# 当前在 builder 目录下
 mkdir build
 cd build
 cmake ..
 make
-./application
+./team-b/application
 ----
 
 == Gradle
@@ -72,7 +72,7 @@ Gradle 遵循约定优先于配置的原则。
 
 [source%nowrap,bash,subs="specialchars,attributes"]
 ----
-# 当前在 source 目录下
+# 当前在 builder 目录下
 ./gradlew build
 team-b/build/exe/main/debug/team-b
 ----
