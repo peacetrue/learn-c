@@ -1,0 +1,50 @@
+= 常见问题
+
+== CLion support make?
+
+默认是 cmake，如何调成 make 模式。
+
+== Build error
+
+----
+====================[ Build | java ]============================================
+make --jobs=12 java
+Error: 'make -jN' is not supported, use 'make JOBS=N'
+/Users/xiayx/Documents/Github/openjdk/jdk18u/make/Init.gmk:115: *** Cannot continue.  Stop.
+----
+
+== GDB run failure(0x5)
+
+[source%nowrap,log]
+----
+Starting program: /Users/xiayx/Documents/Projects/learn-c/main.o
+Unable to find Mach task port for process-id 23790: (os/kern) failure (0x5).
+ (please check gdb is codesigned - see taskgated(8))
+
+Note: this version of macOS has System Integrity Protection.
+Because `startup-with-shell' is enabled, gdb has worked around this by
+caching a copy of your shell.  The shell used by "run" is now:
+    /Users/xiayx/Library/Caches/gdb/bin/sh
+[New Thread 0x2103 of process 24964]
+----
+
+参考：
+
+* https://stackoverflow.com/questions/11504377/gdb-fails-with-unable-to-find-mach-task-port-for-process-id-error[stackoverflow^]
+* https://opensource.apple.com/source/lldb/lldb-69/docs/code-signing.txt[code-signing^]
+
+== main *argv
+
+main 函数 char *argv[] 的含义？
+
+[source%nowrap,c,subs="specialchars,attributes"]
+----
+char a = 'a';
+char b[] = "bbb";
+----
+
+== sizeof 实现原理
+
+数组长度在内存中的表示，
+或者内存中并没有表示，
+只是在编程语言有体现。

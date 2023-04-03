@@ -1,0 +1,266 @@
+LLDB(1)                               LLDB                               LLDB(1)
+
+
+
+NNAAMMEE
+       lldb - LLDB Documentation
+
+SSYYNNOOPPSSIISS
+       llllddbb [_o_p_t_i_o_n_s] _e_x_e_c_u_t_a_b_l_e
+
+
+DDEESSCCRRIIPPTTIIOONN
+       llllddbb is a fully featured debugger. It is a command line interface to the
+       LLDB debugger library.
+
+AATTTTAACCHHIINNGG
+
+       ----aattttaacchh--nnaammee <<nnaammee>>
+              Tells the debugger to attach to a process with the given name.
+
+       ----aattttaacchh--ppiidd <<ppiidd>>
+              Tells the debugger to attach to a process with the given pid.
+
+       --nn <<vvaalluuee>>
+              Alias for --attach-name
+
+       --pp <<vvaalluuee>>
+              Alias for --attach-pid
+
+       ----wwaaiitt--ffoorr
+              Tells the debugger to wait for a process with the given pid or
+              name to launch before attaching.
+
+       --ww     Alias for --wait-for
+
+CCOOMMMMAANNDDSS
+
+       ----bbaattcchh
+              Tells the debugger to run the commands from -s, -S, -o & -O, and
+              then quit.
+
+       --bb     Alias for --batch
+
+       --KK <<vvaalluuee>>
+              Alias for --source-on-crash
+
+       --kk <<vvaalluuee>>
+              Alias for --one-line-on-crash
+
+       ----llooccaall--llllddbbiinniitt
+              Allow the debugger to parse the .lldbinit files in the current
+              working directory, unless --no-lldbinit is passed.
+
+       ----nnoo--llllddbbiinniitt
+              Do not automatically parse any '.lldbinit' files.
+
+       ----oonnee--lliinnee--bbeeffoorree--ffiillee <<ccoommmmaanndd>>
+              Tells the debugger to execute this one-line lldb command before
+              any file provided on the command line has been loaded.
+
+       ----oonnee--lliinnee--oonn--ccrraasshh <<ccoommmmaanndd>>
+              When in batch mode, tells the debugger to run this one-line lldb
+              command if the target crashes.
+
+       ----oonnee--lliinnee <<ccoommmmaanndd>>
+              Tells the debugger to execute this one-line lldb command after any
+              file provided on the command line has been loaded.
+
+       --OO <<vvaalluuee>>
+              Alias for --one-line-before-file
+
+       --oo <<vvaalluuee>>
+              Alias for --one-line
+
+       --QQ     Alias for --source-quietly
+
+       ----ssoouurrccee--bbeeffoorree--ffiillee <<ffiillee>>
+              Tells the debugger to read in and execute the lldb commands in the
+              given file, before any file has been loaded.
+
+       ----ssoouurrccee--oonn--ccrraasshh <<ffiillee>>
+              When in batch mode, tells the debugger to source this file of lldb
+              commands if the target crashes.
+
+       ----ssoouurrccee--qquuiieettllyy
+              Tells the debugger to execute this one-line lldb command before
+              any file has been loaded.
+
+       ----ssoouurrccee <<ffiillee>>
+              Tells the debugger to read in and execute the lldb commands in the
+              given file, after any file has been loaded.
+
+       --SS <<vvaalluuee>>
+              Alias for --source-before-file
+
+       --ss <<vvaalluuee>>
+              Alias for --source
+
+       --xx     Alias for --no-lldbinit
+
+OOPPTTIIOONNSS
+
+       ----aarrcchh <<aarrcchhiitteeccttuurree>>
+              Tells the debugger to use the specified architecture when starting
+              and running the program.
+
+       --aa <<vvaalluuee>>
+              Alias for --arch
+
+       ----ccaappttuurree--ppaatthh <<ffiilleennaammee>>
+              Tells the debugger to use the given filename for the reproducer.
+
+       ----ccaappttuurree
+              Tells the debugger to capture a reproducer.
+
+       ----ccoorree <<ffiilleennaammee>>
+              Tells the debugger to use the full path to <filename> as the core
+              file.
+
+       --cc <<vvaalluuee>>
+              Alias for --core
+
+       ----ddeebbuugg
+              Tells the debugger to print out extra information for debugging
+              itself.
+
+       --dd     Alias for --debug
+
+       ----eeddiittoorr
+              Tells the debugger to open source files using the host's "external
+              editor" mechanism.
+
+       --ee     Alias for --editor
+
+       ----ffiillee <<ffiilleennaammee>>
+              Tells the debugger to use the file <filename> as the program to be
+              debugged.
+
+       --ff <<vvaalluuee>>
+              Alias for --file
+
+       ----hheellpp Prints out the usage information for the LLDB debugger.
+
+       --hh     Alias for --help
+
+       ----nnoo--uussee--ccoolloorrss
+              Do not use colors.
+
+       ----rreeppllaayy <<ffiilleennaammee>>
+              Tells the debugger to replay a reproducer from <filename>.
+
+       ----vveerrssiioonn
+              Prints out the current version number of the LLDB debugger.
+
+       --vv     Alias for --version
+
+       --XX     Alias for --no-use-color
+
+RREEPPLL
+
+       --rr==<<ffllaaggss>>
+              Alias for --repl=<flags>
+
+       ----rreeppll--llaanngguuaaggee <<llaanngguuaaggee>>
+              Chooses the language for the REPL.
+
+       ----rreeppll==<<ffllaaggss>>
+              Runs lldb in REPL mode with a stub process with the given flags.
+
+       --RR <<vvaalluuee>>
+              Alias for --repl-language
+
+SSCCRRIIPPTTIINNGG
+
+       --ll <<vvaalluuee>>
+              Alias for --script-language
+
+       ----ppyytthhoonn--ppaatthh
+              Prints out the path to the lldb.py file for this version of lldb.
+
+       --PP     Alias for --python-path
+
+       ----ssccrriipptt--llaanngguuaaggee <<llaanngguuaaggee>>
+              Tells the debugger to use the specified scripting language for
+              user-defined scripts.
+
+EEXXAAMMPPLLEESS
+       The debugger can be started in several modes.
+
+       Passing an executable as a positional argument prepares lldb to debug the
+       given executable. To disambiguate between arguments passed to lldb and
+       arguments passed to the debugged executable, arguments starting with a -
+       must be passed after --.
+          lldb --arch x86_64 /path/to/program program argument -- --arch arvm7
+
+       For convenience, passing the executable after -- is also supported.
+          lldb --arch x86_64 -- /path/to/program program argument --arch arvm7
+
+       Passing one of the attach options causes llllddbb to immediately attach to
+       the given process.
+          lldb -p <pid> lldb -n <process-name>
+
+       Passing --repl starts llllddbb in REPL mode.
+          lldb -r
+
+       Passing --core causes llllddbb to debug the core file.
+          lldb -c /path/to/core
+
+       Command options can be combined with these modes and cause llllddbb to run
+       the specified commands before or after events, like loading the file or
+       crashing, in the order provided on the command line.
+          lldb -O 'settings set stop-disassembly-count 20' -o 'run' -o 'bt' lldb
+          -S /source/before/file -s /source/after/file lldb -K
+          /source/before/crash -k /source/after/crash
+
+       Note: In REPL mode no file is loaded, so commands specified to run after
+       loading the file (via -o or -s) will be ignored.
+
+UUSSIINNGG LLLLDDBB
+       In llllddbb there is a help command which can be used to find descriptions
+       and examples of all llllddbb commands.  To get help on "breakpoint set" you
+       would type "help breakpoint set".
+
+       There is also an apropos command which will search the help text of all
+       commands for a given term ‐‐ this is useful for locating a command by
+       topic.  For instance, "apropos breakpoint" will list any command that has
+       the word "breakpoint" in its help text.
+
+CCOONNFFIIGGUURRAATTIIOONN FFIILLEESS
+       llllddbb reads things like settings, aliases and commands from the .lldbinit
+       file.
+
+       First, it will read the application specific init file whose name is
+       ~/.lldbinit followed by a "-" and the name of the current program. This
+       would be ~/.lldbinit-lldb for the command line llllddbb and ~/.lldbinit-Xcode
+       for Xcode. If there is no application specific init file, the global
+       ~/.lldbinit is read.
+
+       Secondly, it will look for an .lldbinit file in the current working
+       directory.  For security reasons, llllddbb will print a warning and not
+       source this file by default. This behavior can be changed by changing the
+       target.load-cwd-lldbinit setting.
+
+       To always load the .lldbinit file in the current working directory, add
+       the following command to ~/.lldbinit:
+          settings set target.load-cwd-lldbinit true
+
+       To never load the .lldbinit file in the current working directory and
+       silence the warning, add the following command to ~/.lldbinit:
+          settings set target.load-cwd-lldbinit false
+
+SSEEEE AALLSSOO
+       The LLDB project page _h_t_t_p_s_:_/_/_l_l_d_b_._l_l_v_m_._o_r_g has many different resources
+       for llllddbb users ‐‐ the gdb/lldb command equivalence page
+       _h_t_t_p_s_:_/_/_l_l_d_b_._l_l_v_m_._o_r_g_/_u_s_e_/_m_a_p_._h_t_m_l can be especially helpful for users
+       coming from gdb.
+
+AAUUTTHHOORR
+       LLVM project
+
+CCOOPPYYRRIIGGHHTT
+       2007-2020, The LLDB Team
+
+
+
+8                                 June 10, 2020                          LLDB(1)

@@ -1,0 +1,39 @@
+= 概述
+:website: https://peacetrue.github.io
+:app-group: com.github.peacetrue
+:app-name: learn-c
+:foresight-repo-id:
+:imagesdir: docs/antora/modules/ROOT/assets/images
+
+// image:https://img.shields.io/github/actions/workflow/status/peacetrue/{app-name}/main.yml?branch=master["GitHub Workflow Status",link="https://github.com/peacetrue/{app-name}/actions"]
+// image:https://snyk.io/test/github/peacetrue/{app-name}/badge.svg["Snyk",link="https://app.snyk.io/org/peacetrue"]
+
+//@formatter:off
+
+== 简介（What）
+
+{website}/{app-name}/[{app-name}] 用于记录学习 https://en.wikipedia.org/wiki/C_(programming_language)[C^]、 https://en.wikipedia.org/wiki/C%2B%2B[C++] 的过程。
+
+== 背景（Why）
+
+调试 Java 的时候，遇到 native 方法就会跳过，怎样进入 native 方法内部呢？
+需要编译出一个调试版本的 JDK，JDK 是基于 C 语言实现，所以需要对 C 语言有一定了解。
+
+== 用法（How）
+
+[source%nowrap,bash,subs="specialchars,attributes"]
+----
+git clone https://github.com/peacetrue/learn-c
+----
+
+== 参与者（Who）
+
+. peace(xiayouxue@hotmail.com)
+
+== 活动（When）
+
+初始提交于 2022-11-11，最近提交于 2023-04-02。
+
+== 许可证（License）
+
+https://github.com/peacetrue/{app-name}/blob/master/LICENSE[Apache License 2.0^]

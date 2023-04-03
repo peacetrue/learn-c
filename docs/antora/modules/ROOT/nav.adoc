@@ -1,0 +1,6 @@
+* xref:index.adoc[]
+* xref:start.adoc[]
+* xref:builder.adoc[]
+// * xref:manual.adoc[]
+// * xref:reference.adoc[]
+* xref:version.adoc[]

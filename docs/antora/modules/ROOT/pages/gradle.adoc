@@ -1,0 +1,13 @@
+= Gradle
+
+.参考
+. https://www.jetbrains.com/help/clion/gradle-support.html[CLion Gradle^]
+. https://blog.gradle.org/introducing-the-new-cpp-plugins[介绍新的 C++ 插件^]
+. https://docs.gradle.org/current/userguide/native_software.html[构建原生软件^]
+. https://docs.gradle.org/current/userguide/building_cpp_projects.html[构建 C++ 项目^]
+. https://github.com/gradle/native-samples[Swift 和 C++ 示例项目^]
+
+
+
+
+

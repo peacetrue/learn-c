@@ -1,0 +1,17 @@
+plugins {
+    id 'cpp-application'
+}
+
+// repositories {
+//     maven {
+//         url = '../build/repo'
+//     }
+// }
+
+application {
+    dependencies {
+        implementation project(":team-a")
+//         implementation "com.github.peacetrue.builder:team-a:1.0.0"
+    }
+}
+

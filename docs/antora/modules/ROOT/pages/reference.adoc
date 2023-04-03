@@ -1,0 +1,101 @@
+= 参考指南
+
+== 参考
+
+== 术语
+
+https://en.wikipedia.org/wiki/GNU[GNU^]::
+GNU 是 [.underline]##G##NU's [.underline]##N##ot [.underline]##U##nix 的简称，
+一个广泛的自由软件集合（截至 2022 年 1 月共有 383 个软件包），可用作操作系统或配合其他操作系统使用。
+有个疑问：首字母 G 是如何确定的？。
+
+https://en.wikipedia.org/wiki/GNU_Compiler_Collection[GCC^]::
+GCC 是 [.underline]##G##NU [.underline]##C##ompiler [.underline]##C##ollection 的简称，
+由 GNU 项目生产的优化编译器，支持各种编程语言、硬件架构和操作系统。
+留意 GNU Clang Compiler 的简称也是 GCC。
+
+https://en.wikipedia.org/wiki/GNU_Debugger[GDB^]::
+GDB 是 [.underline]##G##NU [.underline]##D##e[.underline]##b##ugger 的简称，
+GNU 调试器（GDB）是一个可移植的调试器，可在许多类 Unix 系统上运行，并适用于许多编程语言，
+包括 Ada、C、C++、Objective-C、Free Pascal、Fortran、Go 和部分其他语言。
+
+https://en.wikipedia.org/wiki/LLVM[LLVM^]::
+LLVM 是 [.underline]##L##ow [.underline]##L##evel [.underline]##V##irtual [.underline]##M##achine 的简称，
+是一组编译器和工具链技术，可用于开发任何编程语言的前端和任何指令集架构的后端。
+
+https://en.wikipedia.org/wiki/LLDB_(debugger)[LLDB^]::
+LLVM 是 [.underline]##L##ow [.underline]##L##evel [.underline]##D##e[.underline]##b##ugger 的简称，
+是一组编译器和工具链技术，可用于开发任何编程语言的前端和任何指令集架构的后端。
+
+== 文件类型
+
+开发过程中，会涉及各种类型的文件。
+
+C 源文件(c source code file)::
+包含具体实现代码。
+预处理操作包括：引入所有头文件、替换宏、删除注释等等。
+* 非预处理源文件：以 .c 后缀结尾。
+* 预处理后源文件：以 .i 后缀结尾。
+头文件(head file)::
+以 .h 后缀结尾，包含接口声明代码。
+汇编源文件(assembly source code file)::
+C 源文件编译后形成的汇编文件。
+* 非预处理源文件：以 .S(sx/asm) 后缀结尾，代表仍必须通过预处理器的汇编代码。这意味着它可以具有 #include 和 #define 其他宏。
+* 预处理后源文件：以 .s 后缀结尾，纯汇编代码，可以编译成一个对象。
+对象文件(object file)::
+以 .o 后缀结尾，源文件编译后形成对象文件。
+静态库文件::
+以 .a 后缀结尾，一组对象文件的压缩包。
+共享库文件::
+以 .so 后缀结尾，ELF 格式文件即 linux 可执行文件，可用于多个进程的共享。
+程序在使用它时，会在运行时把它映射到自己进程空间的某一处，其不在使用它的程序中。
+二进制文件(bitcode file)::
+以 .bc 后缀结尾，对象文件编译后形成二进制文件。
+可执行文件::
+二进制文件链接后形成可执行文件。
+
+== 编译流程
+
+[source%nowrap,bash,subs="specialchars,attributes"]
+----
+cd $workingDir/learn-c
+# 编译源文件，生成可执行文件，保留中间生成的临时文件
+gcc --save-temps -o main main.c
+# main.c -> main.i -> main.s -> main.o -> main.bc -> main
+
+gcc -E -o main.i main.c
+gcc -S -o main.s main.i
+gcc -c -o main.o main.s
+gcc -o main main.o
+----
+
+== 调试
+
+[source%nowrap,bash,subs="specialchars,attributes"]
+----
+# 编译出一个调试版本的可执行文件
+gcc -g -o main main.c
+gdb main
+# list break info next print
+----
+
+== 构建项目
+
+. 手动
+. Make：Makefile
+. CMake：CMakeList.txt
+. Gradle：cpp-library
+
+== 单元测试
+
+如何在 CLion 中执行 C 单元测试？
+参考 https://www.jetbrains.com/zh-cn/clion/features/unit-testing.html[CLion 单元测试^]。
+
+https://github.com/google/googletest[Google Test^]
+
+
+== 附录
+
+* https://stackoverflow.com/questions/10285410/what-are-s-files[What are .S files?^]
+
+

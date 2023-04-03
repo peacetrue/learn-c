@@ -1,0 +1,18 @@
+// plugins {
+//     id 'maven-publish'
+// }
+//
+// subprojects {
+//     group "com.github.peacetrue.builder"
+//     version "1.0.0"
+//
+//     apply plugin: "maven-publish"
+//     publishing {
+//         repositories {
+//             maven {
+//                 url = '../build/repo'
+//             }
+//         }
+//     }
+// }
+//

@@ -1,0 +1,90 @@
+= 项目构建
+
+一个项目中，会包含来自不同开发者的很多源文件，如何高效构建这些源文件呢？
+
+这里列举一个简单的例子进行说明：团队A开发类库，团队B开发应用，团队B开发的应用依赖于团队A开发的类库。
+
+== 理论
+
+摘抄至 《深入理解计算机系统（第三版文字版）》：
+
+image::builder/theory-01.png[]
+image::builder/theory-02.png[]
+
+== 手动
+
+[source%nowrap,bash,subs="specialchars,attributes"]
+----
+# 当前在 source 目录下
+
+#团队A构建目标文件
+gcc -I team-a/src/main/public -c team-a/src/main/cpp/library.cpp
+
+#团队B构建目标文件
+gcc -I team-a/src/main/public -c team-b/src/main/cpp/application.cpp
+#团队B构建可执行文件
+gcc -o application application.o library.o
+
+# 运行程序
+./application
+# 清除生成的文件
+rm -rf *.o application
+----
+
+TIP: 对于分割到多个资源库的项目，团队A和团队B之间如何约定接口？
+
+== Make
+
+.Makefile
+[source%nowrap,Makefile]
+----
+include::example$builder/Makefile[]
+----
+
+[source%nowrap,bash,subs="specialchars,attributes"]
+----
+# 当前在 source 目录下
+make application
+./application
+----
+
+== CMake
+
+[source%nowrap,bash,subs="specialchars,attributes"]
+----
+# 当前在 source 目录下
+mkdir build
+cd build
+cmake ..
+make
+./application
+----
+
+== Gradle
+
+Gradle 遵循约定优先于配置的原则。
+
+.参考
+. https://docs.gradle.org/current/userguide/building_cpp_projects.html[Building C++ projects^]
+// . https://mvnrepository.com/artifact/org.gradle/googletest/1.8.0
+// . https://www.jetbrains.com/help/clion/gradle-settings.html
+// . https://www.jetbrains.com/help/clion/unit-testing-tutorial.html#adding-framework
+
+[source%nowrap,bash,subs="specialchars,attributes"]
+----
+# 当前在 source 目录下
+./gradlew build
+team-b/build/exe/main/debug/team-b
+----
+
+// == 总结
+//
+// 构建工具可能会有很多，但构建的理念是不变的。 涉及的概念包括：
+//
+// . 头文件、源文件
+// . 编译、链接
+// . 对象文件（目标文件）、静态库文件、动态库文件、可执行文件
+// . 调试版、发行版
+// . window 、linux、macOS
+// . 模块版本、模块依赖、发布部署
+// . 单元测试、覆盖率测试
