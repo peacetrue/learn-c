@@ -9,3 +9,7 @@
 == 1.1.0
 
 集成开发环境 CLion 的使用。
+
+== 1.2.0
+
+准备 CMake Google Test 环境。

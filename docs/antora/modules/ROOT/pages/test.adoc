@@ -1,0 +1,20 @@
+= 测试框架
+
+将源代码、测试代码和测试框架代码编译成可执行文件，使用单元测试的语法构建输出结果。
+
+== GoogleTest
+
+.参考
+. https://github.com/google/googletest.git[Google Test GitHub^]
+. https://www.bookstack.cn/read/CMake-Cookbook/README.md[CMake Cookbook^]
+. https://github.com/dev-cafe/cmake-cookbook[CMake Cookbook GitHub^]
+
+使用 CMake 集成 GoogleTest。
+
+=== 集成 CLion
+
+.参考
+. https://www.jetbrains.com/help/clion/unit-testing-tutorial.html#google-test-framework[CLion 集成 Google Test^]
+. https://github.com/MarinaKalashina/DateConverter_withTests.git[CLion 单元测试样章^]
+
+可以直接在 CLion 中直接运行单元测试。
