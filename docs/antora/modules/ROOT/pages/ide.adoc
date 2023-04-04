@@ -1,0 +1,17 @@
+= 集成开发环境
+
+* 编辑器
+* 运行、调试
+* 集成各种工具链
+
+== CLion
+
+. https://www.jetbrains.com/clion/download[下载^]
+. https://www.jetbrains.com/help/clion/gradle-settings.html[集成 Gradle^]
+. https://www.jetbrains.com/help/clion/unit-testing-tutorial.html[单元测试^]
+
+.CLion 2023.1
+. 强制集成 CMake
+. 通过插件支持 Gradle（没有代码提示）
+
+TIP: 集成开发环境 CLion、构建工具 CMake、单元测试类库 Google Test 之间的关联

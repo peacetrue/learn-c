@@ -13,6 +13,7 @@ image:https://img.shields.io/github/actions/workflow/status/peacetrue/{app-name}
 == 简介（What）
 
 {website}/{app-name}/[{app-name}] 用于记录学习 https://en.wikipedia.org/wiki/C_(programming_language)[C^]、 https://en.wikipedia.org/wiki/C%2B%2B[C++] 的过程。
+以实践为主，同时提供深入理解的参考资料。
 
 == 背景（Why）
 
