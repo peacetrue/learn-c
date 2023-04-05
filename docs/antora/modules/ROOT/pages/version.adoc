@@ -13,3 +13,7 @@
 == 1.2.0
 
 准备 CMake Google Test 环境。
+
+== 1.2.1
+
+完善 builder Makefile 适配 CLion 项目。
