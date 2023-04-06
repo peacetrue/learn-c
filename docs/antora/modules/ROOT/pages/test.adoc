@@ -17,4 +17,4 @@
 . https://www.jetbrains.com/help/clion/unit-testing-tutorial.html#google-test-framework[CLion 集成 Google Test^]
 . https://github.com/MarinaKalashina/DateConverter_withTests.git[CLion 单元测试样章^]
 
-可以直接在 CLion 中直接运行单元测试。
+可以在 CLion 中直接运行单元测试。

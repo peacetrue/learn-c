@@ -28,3 +28,6 @@ jobs:
       with:
         build-root-directory: builder
         arguments: build
+
+    # 使用 cmake 执行测试
+    - run: mkdir -p build && cd build && cmake .. && cmake --build . && src/test/test

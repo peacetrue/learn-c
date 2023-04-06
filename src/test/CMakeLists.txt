@@ -12,7 +12,7 @@ add_subdirectory(
 )
 
 # 配置测试模块
-include_directories(headers) # 指定头文件目录
+include_directories(../lib/public) # 指定头文件目录
 aux_source_directory(cpp TEST_SRCS) # 指定源文件目录
 add_executable(test ${TEST_SRCS})
-target_link_libraries(test gtest gtest_main)
+target_link_libraries(test gtest gtest_main lib)

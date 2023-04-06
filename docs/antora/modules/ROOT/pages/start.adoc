@@ -83,3 +83,8 @@ C++ 包发布和依赖管理可以使用多种工具和平台，以下是一些�
 . JFrog Artifactory：JFrog Artifactory 是一个开源的软件包管理器，支持多种语言和平台，可以用于发布和管理 C++ 库和应用程序，同时可以方便地处理依赖关系和版本控制。
 
 这些工具和平台都有其优缺点，可以根据具体情况选择合适的工具和平台。
+
+== 参考
+
+. https://www.bookstack.cn/read/CMake-Cookbook/README.md[CMake Cookbook^]
+. https://man7.org/linux/man-pages/[linux man-pages^]

@@ -17,3 +17,8 @@
 == 1.2.1
 
 完善 builder Makefile 适配 CLion 项目。
+
+== 1.3.0
+
+. 添加 pthread 基础测试代码
+. GitHub action 添加 cmake 构建
