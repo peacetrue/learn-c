@@ -19,6 +19,7 @@ TEST(Preprocessor, function) {
     EXPECT_EQ(4, MAX(3 + 2, 4 + 2));
 }
 
+
 TEST(Preprocessor, concat) {
 
 #define CONCAT_STR(X) #X"X"#X
@@ -27,4 +28,20 @@ TEST(Preprocessor, concat) {
 #define CONCAT_VAR(X1, X2) X1##X2
     EXPECT_EQ(11, CONCAT_VAR(1, 1));
 }
+
+//宏变量作为宏方法的参数
+inline void none_fence() {}
+
+TEST(Preprocessor, macro_var_as_arg) {
+#define FENCE_TYPE none
+#define FENCE(type) type##_fence()
+#define FENCE_MACRO(type)FENCE(type)
+    FENCE(none);//参数为字面量时使用
+//TODO    FENCE(FENCE_TYPE);  error: use of undeclared identifier 'FENCE_TYPE_fence'
+    FENCE_MACRO(FENCE_TYPE);//参数为宏变量时使用
+}
+
+
+
+
 
