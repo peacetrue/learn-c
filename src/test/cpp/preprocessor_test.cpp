@@ -37,7 +37,7 @@ TEST(Preprocessor, macro_var_as_arg) {
 #define FENCE(type) type##_fence()
 #define FENCE_MACRO(type)FENCE(type)
     FENCE(none);//参数为字面量时使用
-//TODO    FENCE(FENCE_TYPE);  error: use of undeclared identifier 'FENCE_TYPE_fence'
+    //FENCE(FENCE_TYPE);  error: use of undeclared identifier 'FENCE_TYPE_fence'
     FENCE_MACRO(FENCE_TYPE);//参数为宏变量时使用
 }
 
