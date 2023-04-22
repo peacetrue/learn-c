@@ -66,6 +66,8 @@ gcc --save-temps -o main main.c
 gcc -E -o main.i main.c
 gcc -S -o main.s main.i
 gcc -c -o main.o main.s
+# 选项 r 表示添加文件，选项 c 表示新建库文件，选项 s 表示创建符号表
+ar rcs main.a main.o
 gcc -o main main.o
 ----
 
@@ -97,5 +99,36 @@ https://github.com/google/googletest[Google Test^]
 == 附录
 
 * https://stackoverflow.com/questions/10285410/what-are-s-files[What are .S files?^]
+* https://blog.csdn.net/gjq_1988/article/details/39520729[CPU 乱序执行原理^]
+* https://zhuanlan.zhihu.com/p/422848235[内存一致性(Memory Consistency)^]
+* https://zhuanlan.zhihu.com/p/41872203[X86/GCC memory fence的一些见解^]
+* https://www.jianshu.com/p/6ab7c3db13c3[通过 JVM (HotSpot) 源码和汇编理解 Java volatile 实现原理^]
+
+=== mfence
+
+MFENCE 指令对于在该指令前发出的所有从内存加载和存储到内存的指令执行序列化操作。 这种序列化操作确保了在 MFENCE 指令之前以程序顺序排列的每个内存加载和存储指令在 MFENCE 指令之后的任何加载或存储指令之前变得全局可见。MFENCE 指令与所有加载和存储指令，其他 MFENCE 指令，任何 LFENCE 和 SFENCE 指令以及任何序列化指令（如 CPUID 指令）相关。MFENCE 指令不会序列化指令流。
+
+弱排序内存类型可以通过一些技术（如乱序发射、预测读取、写组合和写折叠）来实现更高的处理器性能。数据消费者识别或知道数据是弱排序的程度在各种应用程序中不同，并且可能对生产此数据的系统不可知。 MFENCE 指令提供了一种性能高效的方式，可以确保产生弱排序结果的例程与使用该数据的例程之间的加载和存储排序。
+
+处理器可以自由地从使用 WB、WC 和 WT 存储类型的系统内存区域中推测地提取和缓存数据。这种推测性提取可以随时发生，并且不与指令执行相关。因此，它与 MFENCE 指令的执行不相关；数据可以在执行 MFENCE 指令之前、期间或之后被推测性地带入缓存中。
+
+该指令在非64位模式和64位模式下的操作相同。指令上面的操作码规定了ModR/M字节为F0。对于该指令，处理器忽略ModR/M字节的r/m字段。因此，MFENCE 由任何形如0F AE Fx的操作码编码，其中x在0-7范围内。
+
+=== lock
+
+LOCK 前缀是一种用于将指令转换成原子性操作的 IA-32 和 Intel 64 处理器指令前缀。当处理器执行带有 LOCK 前缀的指令时，会发出 LOCK# 信号，此信号保证当前处理器在访问共享内存时具有独占权，其他处理器需要等待 LOCK# 信号解除后才能访问这块共享内存区域，从而保证操作的原子性和一致性。
+
+在大多数 IA-32 和所有 Intel 64 处理器中，即使没有显式使用 LOCK 前缀，也可以实现类似的原子性操作。这是因为内部硬件机制通常会自动检测并保持对共享内存的独占访问权限，从而避免数据竞争和其他线程安全问题。
+
+LOCK 前缀只能用于以下一组指令以及对应的内存目的操作数形式：ADD、ADC、AND、BTC、BTR、BTS、CMPXCHG、CMPXCH8B、CMPXCHG16B、DEC、INC、NEG、NOT、OR、SBB、SUB、XOR、XADD 和 XCHG。如果将 LOCK 前缀用于其中的一个指令且源操作数是存储器操作数，则可能会产生未定义的操作码异常（\#UD）。如果将 LOCK 前缀用于不在该列表中的任何指令，则也会产生未定义的操作码异常。除此之外，无论是否使用 LOCK 前缀，XCHG 指令总是会发出 LOCK# 信号。
+
+LOCK 前缀通常与 BTS 指令一起使用，用于在共享内存环境中执行读取修改写入（read-modify-write）操作。由于 LOCK 前缀和硬件机制保证了内存访问的原子性和一致性，因此可以确保多线程或多进程环境下的数据访问顺序正确。
+
+需要注意的是，LOCK 前缀的操作与内存区域的对齐方式无关，即可以对任意不对齐的内存区域进行操作。此外，LOCK 前缀的操作在 IA-32 和 Intel 64 模式下具有相同的行为。
+
+从P6系列处理器开始，当 LOCK 前缀被添加到一条指令上，同时该指令要访问的内存区域已经被处理器的内部高速缓存缓存时，通常不会发出 LOCK# 信号。取而代之的是，只有处理器的内部缓存被锁定。在这种情况下，处理器的高速缓存一致性机制会确保操作在内存方面是原子性的。在《Intel® 64 和 IA-32 Architectures 软件开发手册》第3A卷第9章的“锁定操作对内部处理器缓存的影响”一节中可获得更多关于缓存锁定的信息。
+
+
+
 
 

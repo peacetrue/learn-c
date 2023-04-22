@@ -2,14 +2,24 @@
 
 对感兴趣的部分编写对应的用例。
 
+// @formatter:off
+
+== 面向对象
+
+面向对象是面向人编程，面向过程是面向 CPU 编程。
+需求是人提出的，面向对象的程序更符合人的活动，更容易实现人的需求，后续增加的需求也更容易在当前程序中实现；
+如果使用面向过程，需要将人的思维转换为 CPU 的思维。
+
+对象语法测试案例在 `person_test.cpp`。
+
 == pthread
 
 在计算机科学中，POSIX Threads，通常称为 pthread，是一种独立于编程语言的执行模型，也是一种并行执行模型。它允许程序控制多个不同的工作流，在时间上有重叠。每个工作流都称为线程，通过对POSIX Threads API进行调用来创建和控制这些线程。简而言之，pthread提供了一套API，用于多线程编程，并且可以由不同的编程语言调用。每个线程共享相同的全局内存（数据和堆段），但每个线程都有自己的堆栈。
 
-== 实现基本测试环境
+=== 实现基本测试环境
 
 . 目录结构：lib、main、test
-. 文件规范：头文件名称+usage，例如：pthread.h -> pthread_usage.h、pthread_usage.cpp
+. 文件规范：头文件名称+usage，例如：pthread.h -> pthread_usage.h、pthread_usage.cpp、pthread_test.cpp
 
 
 

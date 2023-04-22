@@ -1,50 +1,87 @@
 = 常见问题
 
-== CLion support make?
+== macOS 无法正常使用 GDB
 
-默认是 cmake，如何调成 make 模式。
-
-== Build error
-
+[source%nowrap,bash]
 ----
-====================[ Build | java ]============================================
-make --jobs=12 java
-Error: 'make -jN' is not supported, use 'make JOBS=N'
-/Users/xiayx/Documents/Github/openjdk/jdk18u/make/Init.gmk:115: *** Cannot continue.  Stop.
+uname -a
+# Darwin Kernel Version 22.4.0: Mon Mar  6 21:00:17 PST 2023; root:xnu-8796.101.5~3/RELEASE_X86_64 x86_64
+# macOS 13.3
+
+brew uninstall --force gdb
+brew install gdb
+gdb -v
+# GNU gdb (GDB) 13.1
+
+gcc -g main.cpp -o main
+./main
+gdb main
+# Reading symbols from main...
+(gdb) b main
+# Breakpoint 1 at 0x100003f84: file main.cpp, line 4.
+(gdb) i b
+Num     Type           Disp Enb Address            What
+1       breakpoint     keep y   0x0000000100003f84 in main() at main.cpp:4
+(gdb) r
+#Starting program: /Users/xiayx/Documents/Projects/learn-c/src/instruction/cpp/main
+#Unable to find Mach task port for process-id 25679: (os/kern) failure (0x5).
+# (please check gdb is codesigned - see taskgated(8))
+(gdb) q
 ----
 
-== GDB run failure(0x5)
+=== please check gdb is codesigned
+
+发生此错误是因为 OSX 实现了 pid 访问策略，该策略需要二进制文件的数字签名才能访问其他进程的 pid。
+要使 gdb 能够访问其他进程，我们必须首先对二进制文件进行代码签名。此签名取决于特定的证书，用户必须创建该证书并在系统中注册。
+
+要创建代码签名证书，请打开钥匙串访问应用程序。选择菜单 Keychain Access -> Certificate Assistant -> Create a Certificate …
+
+为证书选择一个名称（例如 gdb-cert），将身份类型设置为自签名根，将证书类型设置为代码签名并选择让我覆盖默认值。在 Continue 上多次单击，直到您到达 Specify a Location For The Certificate 屏幕，然后将 Keychain 设置为 System。
+
+双击证书，打开信任部分，并将代码签名设置为始终信任。退出钥匙串访问应用程序。
+
+重新启动任务化服务，并对二进制文件进行签名。
+
+=== 配置证书
 
 [source%nowrap,log]
 ----
-Starting program: /Users/xiayx/Documents/Projects/learn-c/main.o
-Unable to find Mach task port for process-id 23790: (os/kern) failure (0x5).
- (please check gdb is codesigned - see taskgated(8))
-
-Note: this version of macOS has System Integrity Protection.
-Because `startup-with-shell' is enabled, gdb has worked around this by
-caching a copy of your shell.  The shell used by "run" is now:
-    /Users/xiayx/Library/Caches/gdb/bin/sh
-[New Thread 0x2103 of process 24964]
+Name : gdb-cert
+Identity Type: Self Signed Root
+Certificate Type : Code Signing
 ----
 
-参考：
+=== 签名 GDB
 
-* https://stackoverflow.com/questions/11504377/gdb-fails-with-unable-to-find-mach-task-port-for-process-id-error[stackoverflow^]
-* https://opensource.apple.com/source/lldb/lldb-69/docs/code-signing.txt[code-signing^]
-
-== main *argv
-
-main 函数 char *argv[] 的含义？
-
-[source%nowrap,c,subs="specialchars,attributes"]
+[source%nowrap,bash]
 ----
-char a = 'a';
-char b[] = "bbb";
+# 重启任务化服务，以识别证书
+sudo killall taskgated
+# 签名
+codesign --entitlements gdb-entitlement.xml -fs gdb-cert $(which gdb)
+#codesign -fs gdb-cert "/usr/local/Cellar/gdb/13.1/bin/gdb"
+# 验证
+codesign -v $(which gdb)
+# 再次运行
+gdb main
+----
+// echo "set startup-with-shell off" >> ~/.gdbinit
+
+=== warning: unhandled dyld version (17)
+
+[source%nowrap,bash]
+----
+ld -v
+#BUILD 16:59:53 Feb 24 2023
+#configured to support archs: armv6 armv7 armv7s arm64 arm64e arm64_32 i386 x86_64 x86_64h armv6m armv7k armv7m armv7em
+#LTO support using: LLVM version 14.0.3, (clang-1403.0.22.14.1) (static support for 29, runtime is 29)
+#TAPI support using: Apple TAPI version 14.0.3 (tapi-1403.0.5.1)
 ----
 
-== sizeof 实现原理
+=== 参考
 
-数组长度在内存中的表示，
-或者内存中并没有表示，
-只是在编程语言有体现。
+* https://stackoverflow.com/questions/18423124/please-check-gdb-is-codesigned-see-taskgated8-how-to-get-gdb-installed-w[How to get gdb installed with homebrew code signed?^]
+* https://sourceware.org/gdb/wiki/PermissionsDarwin[PermissionsDarwin^]
+* https://github.com/Homebrew/homebrew-core/issues/20047[warning: unhandled dyld version (17)^]
+
+
