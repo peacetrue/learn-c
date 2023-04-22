@@ -22,3 +22,8 @@
 
 . 添加 pthread 基础测试代码
 . GitHub action 添加 cmake 构建
+
+== 1.4.0
+
+. 测试重排序
+
