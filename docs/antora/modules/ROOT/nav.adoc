@@ -3,6 +3,7 @@
 * xref:builder.adoc[]
 * xref:ide.adoc[]
 * xref:test.adoc[]
+* xref:elf.adoc[]
 * xref:faq.adoc[]
 // * xref:reference.adoc[]
 * xref:version.adoc[]

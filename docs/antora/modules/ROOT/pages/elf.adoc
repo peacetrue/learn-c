@@ -1,0 +1,239 @@
+= ELF
+
+== 理论
+
+ELF 规范的最新版本是 ELF64 ABI（Application Binary Interface）标准，它是针对 64 位处理器架构的 ELF 规范。该标准由 System V ABI（System V Application Binary Interface）委员会制定，目前的版本为 1.0。该标准于 2019 年发布。
+
+ELF64 ABI 标准主要定义了 64 位 ELF 文件的格式、链接方式、调用约定、符号表和重定位表等方面的规范。该标准包括以下内容：
+
+. ELF 文件格式定义，包括文件头、程序头表和节头表等。
+. ELF 文件的链接方式，包括静态链接和动态链接。
+. 函数调用约定，包括参数传递和返回值等方面的规范。
+. 符号表和重定位表的格式定义和使用规范。
+. 异常处理和调试信息的定义。
+
+ELF64 ABI 标准为开发人员提供了一种标准化的方法来创建和处理 64 位 ELF 文件，这有助于不同操作系统和编译器之间的互操作性和可移植性。
+
+以下是 ELF64 ABI 标准的参考地址：
+
+. 官方文档：http://www.sco.com/developers/devspecs/gabi41.pdf
+. ELF 文件格式介绍：https://refspecs.linuxfoundation.org/elf/
+. System V ABI：https://en.wikipedia.org/wiki/System_V_ABI
+. GNU 工具链对 ELF64 ABI 的支持：https://sourceware.org/glibc/wiki/Elf64Abi
+
+=== 虚拟内存空间
+
+在 64 位 Linux 系统中，虚拟内存空间通常被划分为以下几个部分：
+
+. 0X0000000000000000 - 0X00007FFFFFFFFFFF：用户空间（128 TB）
+用户空间包括了进程代码、数据和堆栈等。其中，前 128 GB 的地址空间是可以直接映射到物理内存的，而后面的部分则需要通过页表进行虚拟地址到物理地址的映射。
+. 0X0800000000000000 - 0X7F7FFFFFFFFF：用户空间保留区域（125 PB）
+这个区域是保留给用户空间的，但目前还没有被使用。
+. 0X7F8000000000 - 0X7FFFFFFFFFFF：内核虚拟映射区域（512 GB）
+这个区域是用于内核空间和用户空间之间进行数据传输和通信的。在 64 位 LINUX 中，内核也可以通过虚拟地址来访问物理内存，因此内核的数据结构和代码也可以通过虚拟地址进行访问。
+. 0X800000000000 - 0XFFEFFFFFFFFFFFFF：用户空间保留区域（256 PB）
+这个区域也是保留给用户空间的，但目前还没有被使用。
+. 0XFF00000000000000 - 0XFFFFFFFFFFFFFFFF：内核空间（128 TB）
+这个区域是保留给内核的，包括了内核代码、数据和堆栈等。和用户空间类似，内核也需要通过页表进行虚拟地址到物理地址的映射。
+
+在虚拟内存布局中，用户空间和内核空间之间通过一条称为“内核虚拟地址映射（Kernel Virtual Address Mapping）”的边界进行分隔。这个边界的位置可以通过配置内核的 KASLR（Kernel Address Space Layout Randomization）选项来随机化，以增加系统的安全性。
+
+. https://blog.csdn.net/weixin_35523259/article/details/116640533[linux 64位 虚拟内存空间^]
+. https://www.kernel.org/doc/html/latest/x86/x86_64/mm.html[Memory Management^]
+
+== 实践
+
+源代码所在目录 `src/elf`。
+
+=== 环境
+
+. x86_64 macOS 13
+. VirtualBox 7.0.6
+. Ubuntu 22.1
+
+=== ELF 文件和虚拟内存映射
+
+image::elf/image-2023-04-24-11-05-18-265.png[]
+
+. ELF 文件是否总加载到 0x0000000000400000 处，静态在 0x0000000000400000，动态在 0x555555554000 处，有待进一步验证
+. 堆内存的起始地址为：ELF 文件加载的起始地址 + ELF 文件 Program LOAD Data（除去 NOBITS Section） + 4K 对齐的填充
+. 栈的起始地址是否总为 0x00007FFFFFFFF000，静态动态都在此处
+
+=== 栈调用分析
+
+
+== 常见问题
+
+. 64 位系统虚拟内存最初始的位置存放什么？
+. 虚拟内存程序头从什么位置开始？
+. 虚拟内存程序入口从什么位置开始？
+. https://www.virtualbox.org/ticket/21413[gdb crashes^]
+. 操作系统在加载 ELF 文件时，能否判断出某个标记为可读可写的数据段是只读的？
+
+== 附录
+
+=== 参考资料
+
+. 《程序员的自我修养》
+. https://en.wikipedia.org/wiki/Executable_and_Linkable_Format[elf wiki^]
+. https://www.sco.com/developers/gabi/latest/ch4.intro.html[elf sco^]
+. https://github.com/ruslashev/elfcat[ELF visualizer^]
+. https://www.51cto.com/article/743043.html[程序调试原理^]
+
+=== 调试
+
+对于编译时没有调试信息的程序，调试时可以执行到方法级别即 next 会跳转到下一个方法调用处，但无法按汇编语句执行。
+
+=== readelf
+
+要读取ELF文件中的所有数据结构，可以使用readelf命令并指定不同的选项来查看不同类型的数据结构。以下是一些常见的选项：
+
+. "-h"：显示ELF文件头（ELF Header）的信息，包括文件类型、机器类型、入口点地址、节头表偏移量等。
+. "-l"：显示ELF文件的段头表（Program Header Table）和节头表（Section Header Table）的信息，包括每个段和节的名称、类型、标志、大小、VMA和LMA等。
+. "-S"：显示ELF文件的节（Section）内容，包括节的名称、类型、大小、偏移量、VMA和LMA等。
+. "-s"：显示ELF文件的符号表（Symbol Table）内容，包括符号的名称、类型、绑定、大小、节名称和值等。
+. "-r"：显示ELF文件的重定位节（Relocation Section）内容，包括需要重定位的符号、类型、偏移量和值等。
+. "-n"：显示ELF文件的笔记（Note）内容，包括笔记的所有者、数据大小和描述信息等。
+. "-d"：显示ELF文件的动态节（Dynamic Section）内容，包括动态链接器所需的信息，如共享对象名称、符号重定位表、初始化函数和终止函数等。
+
+=== lldb
+
+lldb 和 gdb 都是调试器，可以用于在开发过程中调试和分析代码中的错误。
+
+下面是 lldb 和 gdb 之间的一些区别：
+
+. 命令语法：lldb 和 gdb 的命令语法略有不同。lldb 命令更加简洁和现代化，而 gdb 命令则更加冗长和传统。
+. 平台支持：lldb 是 LLVM 项目的一部分，因此它的设计更加现代化，支持更多平台（如 macOS、iOS、Linux）。而 gdb 则是 GNU 项目的一部分，主要用于 Linux 和其他类 Unix 系统。
+. 功能特性：lldb 比 gdb 提供了一些新的功能，例如 Python 脚本调试、自动化调试等。
+. 性能：lldb 比 gdb 更快，并且在大多数情况下占用更少的内存。
+
+需要注意的是，lldb 和 gdb 之间的差异可能对一些开发者并不重要，因为它们都提供了基本的调试功能。最终的选择取决于开发者的个人喜好和项目需要。
+
+.基本操作
+[source%nowrap,bash]
+----
+#启动 LLDB
+lldb
+#设置要调试的可执行文件
+file build/empty.bin
+#设置断点
+breakpoint set -f main.c -l 1
+b main
+#查看断点
+breakpoint list
+#删除断点
+breakpoint delete 3
+#保存断点
+breakpoint write my_breakpoints.txt
+#读取断点
+breakpoint read my_breakpoints.txt
+#运行程序
+run
+#查看线程列表
+thread list
+#切换到指定线程
+thread select 1
+#线程回溯。例如 -s 来显示帧的源代码，-f 来显示完整函数名称等
+thread backtrace
+#当前栈帧信息
+frame info
+#查看变量
+print
+#看当前函数的汇编代码
+disassemble
+# 查看符号表信息
+image dump symtab
+# 使用 memory 命令查看栈上的数据。$rsp 表示当前栈顶的地址，x 表示以十六进制格式显示数据，g 表示使用通用寄存器的大小（64 位）
+memory read/xg $rsp
+#查看内存区域
+memory read 0x0000000000400000 -c 16
+# 以十六进制格式查看从地址 0x1000 开始的 16 个字节的内容。/16 表示要查看的字节数，xw 表示以十六进制格式输出 32 位的值
+x/16xw 0x0000000000400000
+# 显示当前线程的所有寄存器
+register read
+# 查看特定的寄存器
+register read rax
+#可以使用 expr 命令来执行指令。该命令允许你在调试会话中执行任意的 C/C++ 表达式，包括函数调用、算术运算、逻辑运算等
+# p 命令和 call 命令
+expr a = b + c
+#next 命令可以单步执行程序
+next
+#单步执行
+step
+step-in
+step-out
+#运行程序直到下一个断点
+continue
+#退出 LLDB
+exit
+----
+
+=== 在 Shell 中执行运算
+
+[source%nowrap,bash]
+----
+#整数运算
+#10 进制运算，输出 10 进制
+echo $((1+1))
+#16 进制运算，输出 10 进制
+echo $((0xA9+0xB2))
+echo $((0x97000))
+#16 进制运算，输出 16 进制
+printf "%x\n" $((0x00000000004c17b0+0x000000000000b490))
+# 输出 10 进制数的 16 进制表示
+printf "%x\n" 97000;
+# 输出 10 进制数的补码
+printf "%x\n" -87;
+# 输出 16 进制数的补码
+printf "%x\n" -0x87;
+# 输出补码的 10 进制数
+printf "%d\n" $((0xffffffffffffff79));
+# 输出补码的 16 进制数，"--"表示结束选项的标志，否则提示 -%: invalid option
+printf -- "-%x\n" $((-$((0xfffffffffffffffc))));
+
+#小数运算。bc 命令是一个用于进行任意精度数学运算的工具，可以接受数学表达式并计算它们的值，
+# 注意：16 进制数需要使用大写，小写无效，应该是为了区分小写的变量名。
+# 直接执行 bc，在随后的交互式界面中输入指令
+bc
+#10 进制运算，输出 10 进制
+echo "1.5 + 2.5" | bc
+#16 进制运算，输出 16 进制。将 obase 放在 ibase 的前面以避免失效现象
+echo "obase=2; ibase=16; A + 6" | bc
+echo "ibase=16; obase=2; A + 6" | bc
+echo "obase=16; ibase=16; A + 6" | bc # 10
+echo "ibase=16; obase=16; A + 6" | bc # 16
+
+#还原小端序字符串
+echo -n "fcffffffffffffff" | sed -E 's/(..)/\1 /g' | tac -s ' ' | sed 's/ //g;$a\'
+----
+
+=== 在 Shell 中执行内存换算
+
+[source%nowrap,bash]
+----
+# 将字节数转换为人类可读的大小
+# 10 进制数
+numfmt --to=iec-i --suffix=B 1024
+numfmt --to=iec-i --suffix=B 900184
+# 16 进制数转 10 进制
+numfmt --to=iec --suffix=B `printf "%d" 0x10000`
+# 16 进制运算后转 10 进制
+numfmt --to=iec --suffix=B `printf "%d" $((0x00000000004C8000-0x0000000000400000))`
+
+# 获取内存映射的区域大小，16 进制字节表示
+cat build/empty.maps \
+| awk '{printf "%s\n", $1}' \
+| awk -F - '{printf "(%s-%s);\n", toupper($2),toupper($1)}' \
+| xargs echo -e 'obase=16;ibase=16;' \
+| bc;
+
+# 获取内存映射的区域大小，10 进制 kb 表示
+cat build/empty.maps \
+| awk '{printf "%s\n", $1}' \
+| awk -F - '{printf "(%s-%s)/400;", toupper($2),toupper($1)}' \
+| xargs echo 'obase=10;ibase=16;' \
+| bc;
+
+# 从反编译文件中，筛选出方法名
+grep '>:' build/empty.bin.objdump > analysis/empty.bin.objdump.function
+----
