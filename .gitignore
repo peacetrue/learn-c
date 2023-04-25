@@ -12,5 +12,6 @@ build
 # c
 cmake-build-debug
 cmake-build-debug-coverage
+cmake-build-release
 autom4te.cache
 *.log
