@@ -1,0 +1,80 @@
+= x86 汇编语言 AT&T 语法案例分析
+
+== 理论
+
+.X86 汇编语言有 2 个主要语法分支：
+1. AT&T 语法，应用于 Unix 及其衍生系统。汇编器：GAS
+2. Intel 语法，应用于 Windows 系统。汇编器：FASM、MASM、NASM、TASM
+
+.参考资料
+. https://en.wikipedia.org/wiki/X86_assembly_language[X86 汇编语言^]
+. https://xiaohanyu.me/posts/2012-03-24-introducing-gas-assembly/[GAS 汇编^]
+. 《Professional Assembly Language》
+. 《NASM中文手册》
+. https://sourceware.org/binutils/docs/
+. https://sourceware.org/binutils/docs/as/index.html[GAS^]
+
+== 案例
+
+源代码：
+
+.empty.cpp
+[source%nowrap,cpp]
+----
+include::example$src/elf/cpp/empty.cpp[]
+----
+
+汇编代码 AT&T 风格：
+
+.empty.s
+[source%nowrap,s]
+----
+include::example$src/elf/analysis/empty.syntax.s[]
+----
+
+.empty.s
+[source%nowrap,bash]
+----
+#正常构建
+make clean build/empty.s
+make build/empty.o.readelf build/empty.o.comment build/empty.bin build/empty.bin.readelf
+build/empty.bin
+
+#删除附加内容
+sed '/.file/d;/.LF/d;/.cfi/d;/.size/d;/.ident/,$d' build/empty.s > build/empty.tiny.s
+make build/empty.tiny.o.readelf build/empty.tiny.o.comment  build/empty.tiny.bin build/empty.tiny.bin.readelf
+build/empty.tiny.bin
+----
+
+.更多测试
+[source%nowrap,bash]
+----
+#是否还能更精简
+sed '/.globl/d;' build/empty.tiny.s > build/empty.bad.s
+make build/empty.bad.o.readelf build/empty.bad.bin.readelf
+
+#可执行栈
+sed 's/.note.GNU-stack,""/.note.GNU-stack,"x"/g' build/empty.s > build/empty.stack.s
+make build/empty.stack.o.readelf build/empty.stack.bin.readelf
+----
+
+=== cfi
+
+.参考
+. https://stackoverflow.com/questions/2529185/what-are-cfi-directives-in-gnu-assembler-gas-used-for
+. https://sourceware.org/binutils/docs/as/CFI-directives.html#CFI-directives
+. https://stackoverflow.com/questions/38552116/how-to-remove-noise-from-gcc-clang-assembly-output[如何移除 GCC/CLANG 输出汇编文件中的噪声^]
+. https://stackoverflow.com/questions/7534420/gas-explanation-of-cfi-def-cfa-offset/7535848#7535848[CFI^]
+. https://dwarfstd.org/doc/DWARF4.pdf[Debugging With Attributed Record Formats^]
+
+==== -fno-asynchronous-unwind-tables
+
+`-fno-asynchronous-unwind-tables` 是 GCC（GNU Compiler Collection）编译器的一个选项。该选项用于控制编译器是否为生成调试信息时包括异步取消表（Asynchronous Unwind Tables，AUR）。
+
+AUR 是一种机制，用于在程序运行时从函数中取消执行，并在取消发生时正确地恢复栈帧。AUR 由 GCC 和一些调试器使用，如 GDB（GNU Debugger）。AUR 在某些情况下对调试非常有用，但也可能会增加二进制文件的大小。
+
+使用 `-fno-asynchronous-unwind-tables` 选项可以禁用编译器生成 AUR。这样可以减少生成的调试信息的大小，并减小二进制文件的大小。但是，这也会降低程序调试时的精度和可靠性，因为调试器将无法正确地恢复栈帧。
+
+总之，使用 `-fno-asynchronous-unwind-tables` 选项需要权衡二进制文件大小和调试信息的精度和可靠性之间的折衷。在生产环境中编译代码时通常使用此选项来优化代码大小，但在开发和调试时则需要慎重考虑。
+
+

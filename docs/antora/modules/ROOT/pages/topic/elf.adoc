@@ -59,7 +59,7 @@ image::elf/image-2023-04-24-11-05-18-265.png[]
 . 堆内存的起始地址为：ELF 文件加载的起始地址 + ELF 文件 Program LOAD Data（除去 NOBITS Section） + 4K 对齐的填充
 . 栈的起始地址是否总为 0x00007FFFFFFFF000，静态动态都在此处
 
-=== 栈调用分析
+=== 栈帧调用分析
 
 
 == 常见问题
@@ -79,10 +79,12 @@ image::elf/image-2023-04-24-11-05-18-265.png[]
 . https://www.sco.com/developers/gabi/latest/ch4.intro.html[elf sco^]
 . https://github.com/ruslashev/elfcat[ELF visualizer^]
 . https://www.51cto.com/article/743043.html[程序调试原理^]
+. ida 逆向工程软件，可用于分析和反汇编二进制程序，以便了解程序的内部工作方式和实现细节
 
 === 调试
 
 对于编译时没有调试信息的程序，调试时可以执行到方法级别即 next 会跳转到下一个方法调用处，但无法按汇编语句执行。
+ida 可支持逐汇编语句调试（据说，尚未验证）。
 
 === readelf
 
@@ -116,9 +118,14 @@ lldb 和 gdb 都是调试器，可以用于在开发过程中调试和分析代�
 lldb
 #设置要调试的可执行文件
 file build/empty.bin
+#查看源码
+source list -f empty.cpp
+source list --context 10
 #设置断点
 breakpoint set -f main.c -l 1
 b main
+b empty.bin`main
+b empty.s:9
 #查看断点
 breakpoint list
 #删除断点

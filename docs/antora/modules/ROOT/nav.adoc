@@ -3,7 +3,9 @@
 * xref:builder.adoc[]
 * xref:ide.adoc[]
 * xref:test.adoc[]
-* xref:elf.adoc[]
+* 相关主题
+** xref:topic/elf.adoc[]
+** xref:topic/gas.adoc[AT&T 汇编语法]
+* xref:glossary.adoc[]
 * xref:faq.adoc[]
-// * xref:reference.adoc[]
 * xref:version.adoc[]

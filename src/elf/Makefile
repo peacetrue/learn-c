@@ -1,14 +1,22 @@
 SUBDIR:=#在子目录下构建时使用，默认为空格，设置时需要以 / 起始，例如：SUBDIR=/dynamic
 SRC:=cpp$(SUBDIR)#设置源文件目录
-BUILD:=build$(SUBDIR)#
+BUILD:=build$(SUBDIR)#设置构建目录
 BUILD:=$(shell echo "$(BUILD)" | tr -d ' ')#删除 BUILD 中的空格，避免执行 clean 时，误删根目录
 #编译选项
 CFLAGS:=
-CFLAGS+=-fno-builtin# 禁用内建函数内联优化。
-CFLAGS+=-static  #创建动态共享库时不能指定此参数 https://stackoverflow.com/questions/44429253/building-a-shared-library-created-a-static-library-instead
-#CFLAGS+=-g #开启调试。追加选项，会添加空格，-fno-builtin -g
-#CFLAGS+= -verbose #输出详细信息
-
+CFLAGS+=-fno-builtin#禁用内建函数内联优化。
+CFLAGS+=-static#静态编译。创建动态共享库时不能指定此参数 https://stackoverflow.com/questions/44429253/building-a-shared-library-created-a-static-library-instead
+#G:=#-g0。默认不开启调试，可以通过参数指定
+#CFLAGS+=$(G)#开启调试。追加选项，会添加空格，串联后形如 -fno-builtin -g
+#NAUT:=#-fno-asynchronous-unwind-tables
+#CFLAGS+=$(NAUT)#该选项用于控制编译器是否为生成调试信息时包括异步取消表
+#NAUT:=#no-
+#CFLAGS+=-f$(NAUT)asynchronous-unwind-tables -f$(NAUT)dwarf2-cfi-asm
+#CFLAGS+=-fno-exceptions
+#CFLAGS+=-fno-rtti
+#CFLAGS+=-masm=intel# intel 汇编语法
+#CFLAGS+=-verbose#输出详细信息
+# nasm -f elf64 empty.s -o output.o
 READELF:= readelf
 #TODO Linux 使用 readelf，其他环境替换为空命令
 OS="`uname -s`"
@@ -75,14 +83,17 @@ $(BUILD)/%.so: $(BUILD)/%.o
 #生成可执行文件
 OBJS:=#额外依赖的对象或其他文件
 $(BUILD)/%.bin: $(BUILD)/%.o $(OBJS)
-	gcc $(CFLAGS)    $^ -o $@
+	gcc $(CFLAGS)   $^ -o $@
+#TODO ld: library not found for -lcrt0.o in macOS
 # 生成 elf 解析文件
 $(BUILD)/%.readelf: $(BUILD)/%
 	$(READELF) -a $< > $@
-$(BUILD)/%.strtab: $(BUILD)/%
-	@$(READELF) -p .strtab $< > $@
 $(BUILD)/%.shstrtab: $(BUILD)/%
 	@$(READELF) -p .shstrtab $< > $@
+$(BUILD)/%.strtab: $(BUILD)/%
+	@$(READELF) -p .strtab $< > $@
+$(BUILD)/%.comment: $(BUILD)/%
+	@$(READELF) -p .comment $< > $@
 $(BUILD)/%.data: $(BUILD)/%
 	@$(READELF) -x .data $< > $@
 $(BUILD)/%.got: $(BUILD)/%
@@ -91,8 +102,8 @@ $(BUILD)/%.got: $(BUILD)/%
 $(BUILD)/%.objdump: $(BUILD)/%
 	@objdump -d -f -z $< > $@
 #readobj=[read]elf+[obj]dump，没有命令，末尾的分号必须
-$(BUILD)/%.readobj: $(BUILD)/%.readelf $(BUILD)/%.strtab $(BUILD)/%.shstrtab $(BUILD)/%.data $(BUILD)/%.objdump $(BUILD)/%.size;
-$(BUILD)/%.readobjs: $(BUILD)/%.o.readobj $(BUILD)/%.a.readobj ; #$(BUILD)/%.so.readobj;
+$(BUILD)/%.readobj: $(BUILD)/%.readelf $(BUILD)/%.strtab $(BUILD)/%.shstrtab $(BUILD)/%.symtab $(BUILD)/%.data $(BUILD)/%.objdump $(BUILD)/%.size;
+$(BUILD)/%.readobjs: $(BUILD)/%.o.readobj; #$(BUILD)/%.a.readobj $(BUILD)/%.so.readobj;
 $(BUILD)/%.readobjb: $(BUILD)/%.bin.readobj;
 $(BUILD)/%.readobjsb: $(BUILD)/%.readobjb $(BUILD)/%.readobjs;
 %: $(BUILD)/%.readobjsb;

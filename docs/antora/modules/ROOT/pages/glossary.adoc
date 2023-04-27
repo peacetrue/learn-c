@@ -1,0 +1,36 @@
+= 术语
+
+https://en.wikipedia.org/wiki/GNU[GNU^]::
+GNU 是 [.underline]##G##NU's [.underline]##N##ot [.underline]##U##nix 的简称，
+一个广泛的自由软件集合（截至 2022 年 1 月共有 383 个软件包），可用作操作系统或配合其他操作系统使用。
+有个疑问：首字母 G 是如何确定的？。
+
+https://en.wikipedia.org/wiki/GNU_Compiler_Collection[GCC^]::
+GCC 是 [.underline]##G##NU [.underline]##C##ompiler [.underline]##C##ollection 的简称，
+由 GNU 项目生产的优化编译器，支持各种编程语言、硬件架构和操作系统。
+留意 GNU Clang Compiler 的简称也是 GCC。
+
+https://en.wikipedia.org/wiki/GNU_Debugger[GDB^]::
+GDB 是 [.underline]##G##NU [.underline]##D##e[.underline]##b##ugger 的简称，
+GNU 调试器（GDB）是一个可移植的调试器，可在许多类 Unix 系统上运行，并适用于许多编程语言，
+包括 Ada、C、C++、Objective-C、Free Pascal、Fortran、Go 和部分其他语言。
+
+https://en.wikipedia.org/wiki/LLVM[LLVM^]::
+LLVM 是 [.underline]##L##ow [.underline]##L##evel [.underline]##V##irtual [.underline]##M##achine 的简称，
+是一组编译器和工具链技术，可用于开发任何编程语言的前端和任何指令集架构的后端。
+
+https://en.wikipedia.org/wiki/LLDB_(debugger)[LLDB^]::
+LLVM 是 [.underline]##L##ow [.underline]##L##evel [.underline]##D##e[.underline]##b##ugger 的简称，
+是一组编译器和工具链技术，可用于开发任何编程语言的前端和任何指令集架构的后端。
+
+https://sourceware.org/[sourceware^]::
+sourceware 是 source 和 ware 的组合，source 表示源代码，ware 表示器具，组合起来表示开放源代码的软件。
+类似的有 software 软的器具即软件，hardware 硬的器具即硬件。
+
+. https://sourceware.org/binutils/
+
+https://softwareengineering.stackexchange.com/questions/226573/why-is-the-unix-linker-called-ld[ld^]::
+ld 是链接器（linker）命令，为什么它叫 ld 而不是 lk 呢？有两种解释：
+
+1. [.underline]##l##ink e[.underline]##d##itor 的简称
+2. [.underline]##l##oa[.underline]##d##er 的简称
