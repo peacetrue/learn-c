@@ -23,3 +23,13 @@ TEST(ELF, DECORATE_SYMBOL) {
     elf::var = 1;
     EXPECT_EQ(1, _ZN3elf3varE);
 }
+
+void bye_in_atexit() {
+    printf("bye in atexit!\n");
+}
+
+/** 测试 atexit */
+TEST(ELF, ATEXIT) {
+    printf("bye in test!\n");
+    atexit(&bye_in_atexit);
+}
