@@ -24,12 +24,40 @@ TEST(ELF, DECORATE_SYMBOL) {
     EXPECT_EQ(1, _ZN3elf3varE);
 }
 
-void bye_in_atexit() {
-    printf("bye in atexit!\n");
+/* 测试执行顺序 */
+
+void constructor_init() __attribute__((constructor));
+
+void constructor_init() {
+    printf("constructor_init!\n");
+}
+
+int static_init() {
+    printf("static_init!\n");
+    return 0;
+}
+
+// 必须有返回值，不能直接调用 static_init()
+int g = static_init();
+
+void atexit_fini() {
+    printf("atexit_fini!\n");
 }
 
 /** 测试 atexit */
 TEST(ELF, ATEXIT) {
-    printf("bye in test!\n");
-    atexit(&bye_in_atexit);
+    printf("main!\n");
+    atexit(&atexit_fini);
+    //constructor_init!
+    //static_init!
+    //main!
+    //atexit_fini!
+    //destructor_fini
 }
+
+void destructor_fini() __attribute__((destructor));
+
+void destructor_fini() {
+    printf("destructor_fini!\n");
+}
+
