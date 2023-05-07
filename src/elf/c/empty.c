@@ -2,3 +2,14 @@
 int main() {
 }
 
+/*
+# make empty-static.clean
+# make empty.readobjbin SUBDIR=/empty-static STATIC=-static
+# make empty.lldb SUBDIR=/empty-static
+# make empty.bin.maps SUBDIR=/empty-static
+
+# make empty-dynamic.clean
+# make empty.readobjbin SUBDIR=/empty/dynamic
+# make empty.lldb SUBDIR=/empty-dynamic
+# make empty.bin.maps SUBDIR=/empty-dynamic
+*/
