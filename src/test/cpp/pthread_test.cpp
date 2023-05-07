@@ -34,3 +34,30 @@ TEST(pthread, tsd) {
         pthread_join(thread, nullptr);
     }
 }
+
+
+/*
+ * 线程局部存储（TLS，Thread Local Storage）。
+ */
+static __thread int tls_flag = 0;
+
+void *tls_func(void *arg) {
+    auto tid = (intptr_t) arg;
+    tls_flag = (int) tid;
+    printf("Thread %ld gets TLS: %i\n", tid, tls_flag);
+    return nullptr;
+}
+
+TEST(pthread, tls) {
+    pthread_t threads[3];
+    for (int i = 0; i < 3; i++) {
+        pthread_create(&threads[i], nullptr, tls_func, (void *) (intptr_t) i);
+    }
+    for (auto &thread: threads) {
+        pthread_join(thread, nullptr);
+    }
+
+    printf("Parent Thread gets TLS: %i\n", tls_flag);
+    EXPECT_EQ(0, tls_flag);
+}
+
