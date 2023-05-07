@@ -27,10 +27,16 @@ TEST(ELF, DECORATE_SYMBOL) {
 
 /* 测试执行顺序 */
 
-void constructor_init() __attribute__((constructor));
+void test_constructor_init() __attribute__((constructor));
 
-void constructor_init() {
+void test_constructor_init() {
     printf("constructor_init!\n");
+}
+
+void destructor_fini() __attribute__((destructor));
+
+void destructor_fini() {
+    printf("destructor_fini!\n");
 }
 
 int static_init() {
@@ -56,19 +62,13 @@ TEST(ELF, ATEXIT) {
     //destructor_fini
 }
 
-void destructor_fini() __attribute__((destructor));
-
-void destructor_fini() {
-    printf("destructor_fini!\n");
-}
-
 
 
 /**
  * printf 的狂乱输出。
- * 在这个程序里，printf的第一个输出参数是一个 int(4字节)，
- * 而我们告诉printf它是一个double(8字节以上)，
- * 因此printf的输出会错误，由于printf在读取double的时候实际造成了越界，
+ * 在这个程序里，printf 的第一个输出参数是一个 int(4字节)，
+ * 而我们告诉 printf 它是一个double(8字节以上)，
+ * 因此 printf 的输出会错误，由于printf在读取double的时候实际造成了越界，
  * 因此后面几个参数的输出也会失败。
  */
 TEST(ELF, PRINTF) {

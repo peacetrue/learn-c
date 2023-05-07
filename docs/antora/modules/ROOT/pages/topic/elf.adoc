@@ -41,6 +41,40 @@ ELF64 ABI 标准为开发人员提供了一种标准化的方法来创建和处�
 . https://blog.csdn.net/weixin_35523259/article/details/116640533[linux 64位 虚拟内存空间^]
 . https://www.kernel.org/doc/html/latest/x86/x86_64/mm.html[Memory Management^]
 
+=== 函数调用规范
+
+x86_64架构的函数调用规范是由操作系统规定的，通常称为“System V AMD64 ABI”或“x86_64 ABI”。
+
+下面是一些重要的规范：
+
+1. 参数传递::
+
+前六个参数按照顺序被存放在寄存器%rdi，%rsi，%rdx，%rcx，%r8和%r9中。如果函数有更多的参数，它们会被依次压入堆栈中。
+
+2. 栈帧：
+
+当一个函数被调用时，它会使用栈来保存其局部变量和临时变量。在函数开始时，需要先分配一个栈帧，可以使用指令“subq $<size>, %rsp”来实现。其中<size>是需要分配的字节数。
+
+3. 返回值：
+
+返回值通常通过寄存器%rax来传递。如果返回值超过了64位，则会通过寄存器%rdx和%rax一起传递。
+
+4. 栈对齐：
+
+栈在调用过程中需要被对齐，以提高访问速度。在x86_64 ABI中，栈的对齐方式为16字节对齐，也就是说，栈指针（%rsp）的值必须是16的倍数。
+
+5. 寄存器保护：
+
+在函数开始时，所有被调用者保存的寄存器都需要被保存到栈上，包括%rbp，%rbx，%r12，%r13，%r14和%r15。这些寄存器在函数结束时需要被恢复到它们原来的值。
+
+6. 函数调用：
+
+调用一个函数时，需要将返回地址（即下一条指令的地址）和调用者保存的寄存器的值（如果有的话）压入栈中。然后跳转到函数的入口点。
+
+7. 函数返回：
+
+函数返回时，需要先将返回值存放在%rax中，然后将调用者保存的寄存器的值从栈中恢复，并将栈帧释放。最后跳转到返回地址。
+
 == 实践
 
 源代码所在目录 `src/elf`。
@@ -59,8 +93,77 @@ image::elf/image-2023-04-24-11-05-18-265.png[]
 . 堆内存的起始地址为：ELF 文件加载的起始地址 + ELF 文件 Program LOAD Data（除去 NOBITS Section） + 4K 对齐的填充
 . 栈的起始地址是否总为 0x00007FFFFFFFF000，静态动态都在此处
 
-=== 栈帧调用分析
+=== 装载过程
 
+在 Linux 系统中，C 语言程序的执行过程是通过操作系统提供的 C 运行库（libc）来实现的，而在这个库中，程序的入口函数是 `_start`。
+`_start` 函数实际上是 C 运行时环境的启动代码，主要的任务是初始化 C 运行时环境，并将控制权传递给 C 语言的 `main` 函数。
+当程序启动时，操作系统会把控制权交给 `_start` 函数，然后由 `_start` 函数初始化 C 运行时环境，并调用 `main` 函数，最后 `_start` 函数在 `main` 函数返回后退出程序。
+
+在 libc 中，`_start` 函数通常由汇编代码实现，其主要过程如下：
+
+1. 进行一些基本的初始化，例如设置堆栈指针和栈帧、清零 bss 段等。
+
+2. 调用 `__libc_start_main` 函数，这个函数将会调用程序的 `main` 函数。 `__libc_start_main` 函数的原型如下：
+
+```c
+int __libc_start_main(
+    int (*main) (int, char **, char **),
+    int argc, char **argv,
+    void (*init) (void),
+    void (*fini) (void),
+    void (*rtld_fini) (void),
+    void (*stack_end)
+);
+```
+
+其中，`main` 参数就是程序的主函数，`argc` 和 `argv` 分别表示命令行参数的数量和值，`init` 和 `fini` 是可选的函数指针，用于在程序启动和结束时执行一些初始化和清理工作，`rtld_fini` 是 ld.so (动态链接器) 用于在程序退出时清理的回调函数，最后一个参数 `stack_end` 表示当前进程的栈的结束地址。
+
+3. `__libc_start_main` 函数调用完 `main` 函数后，执行一些清理工作并退出程序。
+
+需要注意的是，`_start` 函数不是 C 语言的 `main` 函数，因此它不能调用 C 标准库中的函数，也不能使用 C 语言的语法和数据类型，它只能使用汇编语言实现。
+
+=== ld
+
+ /usr/lib/gcc/x86_64-linux-gnu/11/collect2
+    -plugin /usr/lib/gcc/x86_64-linux-gnu/11/liblto_plugin.so
+    -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/11/lto-wrapper
+    -plugin-opt=-fresolution=/tmp/cciJaVPe.res
+    -plugin-opt=-pass-through=-lgcc
+    -plugin-opt=-pass-through=-lgcc_eh
+    -plugin-opt=-pass-through=-lc
+    --build-id -m elf_x86_64 --hash-style=gnu --as-needed -static -z relro
+    -o build/empty/static/empty.bin
+    /usr/lib/gcc/x86_64-linux-gnu/11/../../../x86_64-linux-gnu/crt1.o
+    /usr/lib/gcc/x86_64-linux-gnu/11/../../../x86_64-linux-gnu/crti.o
+    /usr/lib/gcc/x86_64-linux-gnu/11/crtbeginT.o
+    -L/usr/lib/gcc/x86_64-linux-gnu/11
+    -L/usr/lib/gcc/x86_64-linux-gnu/11/../../../x86_64-linux-gnu
+    -L/usr/lib/gcc/x86_64-linux-gnu/11/../../../../lib
+    -L/lib/x86_64-linux-gnu -L/lib/../lib
+    -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib
+    -L/usr/lib/gcc/x86_64-linux-gnu/11/../../.. build/empty/static/empty.o
+    --start-group -lgcc -lgcc_eh -lc
+    --end-group /usr/lib/gcc/x86_64-linux-gnu/11/crtend.o
+    /usr/lib/gcc/x86_64-linux-gnu/11/../../../x86_64-linux-gnu/crtn.o
+
+* frame #0: 0x0000000000401745 empty.bin`main
+frame #1: 0x0000000000401b8a empty.bin`__libc_start_call_main + 106
+frame #2: 0x00000000004033e7 empty.bin`__libc_start_main_impl + 2535
+frame #3: 0x0000000000401645 empty.bin`_start + 37
+
+
+== 讲解思路
+
+. 前言
+.. 参考资料。可能有一些我觉得不重要或者疏忽的内容，读者可以自行查阅资料进行学习。
+.. 理论+实践
+.. 实验环境
+. 构建过程概述
+. 构建过程案例
+. 文件布局和文件类型
+. 静态链接
+. 动态链接
+. 重定位
 
 == 常见问题
 
@@ -69,6 +172,17 @@ image::elf/image-2023-04-24-11-05-18-265.png[]
 . 虚拟内存程序入口从什么位置开始？
 . https://www.virtualbox.org/ticket/21413[gdb crashes^]
 . 操作系统在加载 ELF 文件时，能否判断出某个标记为可读可写的数据段是只读的？
+. 链接时，如何加入 _start 函数？
+. 执行时，_start 函数的执行逻辑？
+. 动态加载器如何确定共享库实际映射的虚拟内存地址？
+
+=== x86-64 Linux 为何从 555555554000 处开始映射虚拟内存地址？
+
+x86-64 Linux 程序的默认起始虚拟地址是 0x00005555 54000000，也就是 5 兆 5 百万，这个值是根据内核参数 RANDOMIZE_VA_SPACE 计算得到的。
+如果开启了这个参数，内核会随机化程序的虚拟地址空间的起始位置，这有助于防范一些针对特定地址的攻击，同时也可以增加内核堆栈的随机性。
+但是，在默认情况下，程序的虚拟地址从这个值开始映射，因此可以看到 ELF 文件的虚拟内存地址从 555555554000 处开始。
+
+. https://blog.csdn.net/Rong_Toa/article/details/118578755[linux内存布局和地址空间布局随机化（ASLR）下的可分配地址空间^]
 
 == 附录
 
@@ -80,6 +194,7 @@ image::elf/image-2023-04-24-11-05-18-265.png[]
 . https://github.com/ruslashev/elfcat[ELF visualizer^]
 . https://www.51cto.com/article/743043.html[程序调试原理^]
 . ida 逆向工程软件，可用于分析和反汇编二进制程序，以便了解程序的内部工作方式和实现细节
+. https://stackoverflow.com/questions/64424692/how-does-the-address-of-r-x86-64-plt32-computed[尽管重新定位条目的类型是R_X86_64_PLT32，但链接器仍将使用R_X86_64_PC32^]
 
 === 调试
 
@@ -131,9 +246,9 @@ breakpoint list
 #删除断点
 breakpoint delete 3
 #保存断点
-breakpoint write my_breakpoints.txt
+breakpoint write -f my_breakpoints.json
 #读取断点
-breakpoint read my_breakpoints.txt
+breakpoint read my_breakpoints.json
 #运行程序
 run
 #查看线程列表
@@ -148,10 +263,17 @@ frame info
 print
 #看当前函数的汇编代码
 disassemble
+# 查看指定函数的汇编代码
+dis -n _start
 # 查看符号表信息
 image dump symtab
 # 使用 memory 命令查看栈上的数据。$rsp 表示当前栈顶的地址，x 表示以十六进制格式显示数据，g 表示使用通用寄存器的大小（64 位）
 memory read/xg $rsp
+mem read -f s $rsi
+x/16xg $rsp
+x/g $rsp
+x/g $rsp+8
+p (char*)0x00007fffffffe5e9
 #查看内存区域
 memory read 0x0000000000400000 -c 16
 # 以十六进制格式查看从地址 0x1000 开始的 16 个字节的内容。/16 表示要查看的字节数，xw 表示以十六进制格式输出 32 位的值
@@ -211,7 +333,7 @@ echo "obase=16; ibase=16; A + 6" | bc # 10
 echo "ibase=16; obase=16; A + 6" | bc # 16
 
 #还原小端序字符串
-echo -n "fcffffffffffffff" | sed -E 's/(..)/\1 /g' | tac -s ' ' | sed 's/ //g;$a\'
+echo -n "64656d2f732f6169656c5f662d6e7261" | sed -E 's/(..)/\1 /g' | tac -s ' ' | sed 's/ //g;$a\'
 ----
 
 === 在 Shell 中执行内存换算

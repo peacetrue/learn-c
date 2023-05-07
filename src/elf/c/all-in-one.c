@@ -1,5 +1,5 @@
-/** 演示不需要依赖 crt 和 libc */
-char *str = "Hello world!\n";
+/** 演示不依赖 crt 和 libc 的程序 */
+const char *const str = "Hello world!\n";
 
 /**
  * int write(int filedesc, char* buffer, int size);
@@ -22,7 +22,7 @@ void print() {
  * EXIT 系统调用中，ebx 表示进程退出码(Exit Code)。
  */
 void exit() {
-    __asm("movl $42,%ebx  \n\t"
+    __asm("movl $0,%ebx  \n\t"
           "movl $1,%eax  \n\t"
           "int $0x80\n\t");
 }

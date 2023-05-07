@@ -1,6 +1,6 @@
 /** 用于计算 ELF 文件内各个段的偏移。 */
 
-#include <cstdio>
+#include <stdio.h>
 
 int main() {
     int start_of_program_headers = 64;

@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include <cstdio>
+// Linux 系统调用约定：https://cq674350529.github.io/2020/01/13/C与汇编语言混合使用/
 
 // 通常，函数调用都有一定的开销，因为函数的调用过程包括建立调用、传递参数、跳转到函数代码并返回。
 // 使用宏使代码内联，可以避免这样的开销。
@@ -27,6 +28,35 @@ TEST(INLINE, ASM) {
             );
     EXPECT_EQ(a, b);
 }
+
+/**
+ * 调用 write 系统调用实现打印字符串。
+ * @param message 字符串
+ * @return 字符长度
+ */
+static ssize_t write_(int fd, const void *buf, size_t size) {
+    ssize_t ret;
+    asm(
+            "movq $4, %%rax\n"  // 系统调用编号为 1，表示 write
+            "movl %1, %%ebx\n"  // 第一个参数是文件描述符
+            "movq %2, %%rcx\n"  // 第二个参数是要写入的数据的地址
+            "movq %3, %%rdx\n"  // 第三个参数是要写入的数据的长度
+            "int $0x80\n"       // 执行系统调用
+            "movq %%rax, %0\n"  // 将系统调用返回值保存到 ret 变量中
+            : "=r" (ret)
+            : "r" (fd), "r" (buf), "r" (size)
+            : "%rax", "%ebx", "%rcx", "%rdx"
+            );
+    return ret;
+}
+
+TEST(INLINE, WRITE) {
+    const char *message = "Hello, world!\n";
+    size_t len = strlen(message);
+    write_(STDOUT_FILENO, message, len);
+}
+
+
 
 //该代码片段中使用了 GCC 扩展语法的内联汇编，通过 volatile 关键字和空的汇编指令来实现对内存屏障(Memory Barrier)的插入。
 // 具体来说，该汇编语句会告诉编译器在此处插入一条内存屏障指令，以防止编译器进行代码重排优化，保证代码执行顺序的正确性。

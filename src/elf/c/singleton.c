@@ -1,5 +1,5 @@
 /** 独立案例，用于分析变量在汇编及 ELF 中的表示 */
-#include <cstdio>
+#include <stdio.h>
 
 int init_var_cross_file = 1; // 初始化 变量 跨文件共享
 int unin_var_cross_file;     // 未初始 变量 跨文件共享
