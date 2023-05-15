@@ -14,4 +14,14 @@ cmake-build-debug
 cmake-build-debug-coverage
 cmake-build-release
 autom4te.cache
-*.log
+*.log_mini
+crt
+*.plantuml
+*.mmd
+instruction
+my_breakpoints*.json
+temp.adoc
+reorder.cpp
+reorder_test.cpp
+syntax_.adoc
+minicrt

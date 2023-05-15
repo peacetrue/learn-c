@@ -29,23 +29,53 @@ TEST(INLINE, ASM) {
     EXPECT_EQ(a, b);
 }
 
+/*
+在 Linux 系统中，`syscall` 和 `int 0x80` 都是用于调用系统调用的指令，但它们在实现上存在一些区别。
+
+`int 0x80` 是一种传统的系统调用方式，
+ 在早期的 Linux 系统中广泛使用。当执行 `int 0x80` 指令时，
+ 处理器会进入内核态并跳转到系统调用处理程序，
+ 由该处理程序根据传入的系统调用号来调用对应的系统调用函数。
+ 在 `int 0x80` 指令中，系统调用号会被传递到 `eax` 寄存器中，
+ 而其他的参数则会被传递到其他的寄存器中，例如文件描述符、指向缓冲区的指针等。
+
+`syscall` 是一种较新的系统调用方式，
+ 它是在 Linux 2.5 版本中引入的。与 `int 0x80` 不同，
+ `syscall` 使用固定的寄存器来传递系统调用号和其他参数，
+ 具体来说，系统调用号会被传递到 `rax` 寄存器中，
+ 而其他的参数则会被传递到 `rdi`、`rsi`、`rdx`、`r10`、`r8` 和 `r9` 等寄存器中，
+ 这些寄存器被称为系统调用参数寄存器。
+
+相比于 `int 0x80`，`syscall` 具有以下优点：
+
+1. `syscall` 的参数传递更加灵活，可以传递更多的参数，并且不需要使用堆栈来传递参数，避免了栈操作的开销。
+2. `syscall` 的处理程序使用了更加高效的方式来处理系统调用，可以避免一些不必要的操作，提高了系统调用的效率。
+3. `syscall` 支持更多的系统调用，包括一些新的系统调用，例如 `ioctl` 等。
+需要注意的是，使用 `syscall` 指令时需要满足一些条件，例如必须在 64 位系统中使用，
+而且需要使用指定的寄存器来传递系统调用号和参数。
+因此，在编写系统调用相关的代码时，需要根据具体的系统和处理器架构选择合适的指令。
+*/
+
+
 /**
- * 调用 write 系统调用实现打印字符串。
- * @param message 字符串
- * @return 字符长度
+ * write 系统调用。
+ * @param fd 文件描述符
+ * @param buf 输出缓冲区
+ * @param count 缓冲区字节长度
+ * @return 输出内容字节长度
  */
-static ssize_t write_(int fd, const void *buf, size_t size) {
-    ssize_t ret;
-    asm(
-            "movq $4, %%rax\n"  // 系统调用编号为 1，表示 write
-            "movl %1, %%ebx\n"  // 第一个参数是文件描述符
-            "movq %2, %%rcx\n"  // 第二个参数是要写入的数据的地址
-            "movq %3, %%rdx\n"  // 第三个参数是要写入的数据的长度
-            "int $0x80\n"       // 执行系统调用
-            "movq %%rax, %0\n"  // 将系统调用返回值保存到 ret 变量中
-            : "=r" (ret)
-            : "r" (fd), "r" (buf), "r" (size)
-            : "%rax", "%ebx", "%rcx", "%rdx"
+long write_(long fd, const void *buf, long count) {
+    long ret = -1;
+    __asm  (
+            "movq $1, %%rax\n\t"  // write 系统调用号为 1
+            "movq %1, %%rdi\n\t"  // 文件描述符 stdout = 1
+            "movq %2, %%rsi\n\t"  // 字符串地址
+            "movq %3, %%rdx\n\t"  // 字符串长度
+            "syscall\n\t"
+            "movq %%rax, %0\n\t"
+            :"=r"(ret)
+            : "r"(fd), "r"(buf), "r"(count)
+            : "rax", "rdx", "rdi", "rsi"
             );
     return ret;
 }

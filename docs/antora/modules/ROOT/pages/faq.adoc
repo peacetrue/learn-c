@@ -44,7 +44,7 @@ Num     Type           Disp Enb Address            What
 
 === 配置证书
 
-[source%nowrap,log]
+[source%nowrap,log_mini]
 ----
 Name : gdb-cert
 Identity Type: Self Signed Root

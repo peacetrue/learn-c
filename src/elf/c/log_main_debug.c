@@ -1,7 +1,7 @@
-#include "group_lib.h"
+#include "log_lib.h"
 
 int main(int argc, char *argv[]) {
     default_level = LEVEL_DEBUG;
-    log(argv[0]);
+    log_mini(argv[0]);
 }
 

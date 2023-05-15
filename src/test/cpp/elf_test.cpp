@@ -45,7 +45,7 @@ int static_init() {
 }
 
 // 必须有返回值，不能直接调用 static_init()
-int g = static_init();
+//int g = static_init();
 
 void atexit_fini() {
     printf("atexit_fini!\n");
