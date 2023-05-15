@@ -1,5 +1,7 @@
 = ELF
 
+// @formatter:off
+
 == 理论
 
 ELF 规范的最新版本是 ELF64 ABI（Application Binary Interface）标准，它是针对 64 位处理器架构的 ELF 规范。该标准由 System V ABI（System V Application Binary Interface）委员会制定，目前的版本为 1.0。该标准于 2019 年发布。
@@ -16,10 +18,10 @@ ELF64 ABI 标准为开发人员提供了一种标准化的方法来创建和处�
 
 以下是 ELF64 ABI 标准的参考地址：
 
-. 官方文档：http://www.sco.com/developers/devspecs/gabi41.pdf
-. ELF 文件格式介绍：https://refspecs.linuxfoundation.org/elf/
-. System V ABI：https://en.wikipedia.org/wiki/System_V_ABI
-. GNU 工具链对 ELF64 ABI 的支持：https://sourceware.org/glibc/wiki/Elf64Abi
+. 官方文档： http://www.sco.com/developers/devspecs/gabi41.pdf
+. ELF 文件格式介绍： https://refspecs.linuxfoundation.org/elf/
+. System V ABI： https://en.wikipedia.org/wiki/System_V_ABI
+. GNU 工具链对 ELF64 ABI 的支持： https://sourceware.org/glibc/wiki/Elf64Abi
 
 === 虚拟内存空间
 
@@ -47,32 +49,19 @@ x86_64架构的函数调用规范是由操作系统规定的，通常称为“Sy
 
 下面是一些重要的规范：
 
-1. 参数传递::
-
+参数传递::
 前六个参数按照顺序被存放在寄存器%rdi，%rsi，%rdx，%rcx，%r8和%r9中。如果函数有更多的参数，它们会被依次压入堆栈中。
-
-2. 栈帧：
-
+栈帧::
 当一个函数被调用时，它会使用栈来保存其局部变量和临时变量。在函数开始时，需要先分配一个栈帧，可以使用指令“subq $<size>, %rsp”来实现。其中<size>是需要分配的字节数。
-
-3. 返回值：
-
+返回值::
 返回值通常通过寄存器%rax来传递。如果返回值超过了64位，则会通过寄存器%rdx和%rax一起传递。
-
-4. 栈对齐：
-
+栈对齐::
 栈在调用过程中需要被对齐，以提高访问速度。在x86_64 ABI中，栈的对齐方式为16字节对齐，也就是说，栈指针（%rsp）的值必须是16的倍数。
-
-5. 寄存器保护：
-
+寄存器保护::
 在函数开始时，所有被调用者保存的寄存器都需要被保存到栈上，包括%rbp，%rbx，%r12，%r13，%r14和%r15。这些寄存器在函数结束时需要被恢复到它们原来的值。
-
-6. 函数调用：
-
+函数调用::
 调用一个函数时，需要将返回地址（即下一条指令的地址）和调用者保存的寄存器的值（如果有的话）压入栈中。然后跳转到函数的入口点。
-
-7. 函数返回：
-
+函数返回::
 函数返回时，需要先将返回值存放在%rax中，然后将调用者保存的寄存器的值从栈中恢复，并将栈帧释放。最后跳转到返回地址。
 
 == 实践
@@ -93,77 +82,90 @@ image::elf/image-2023-04-24-11-05-18-265.png[]
 . 堆内存的起始地址为：ELF 文件加载的起始地址 + ELF 文件 Program LOAD Data（除去 NOBITS Section） + 4K 对齐的填充
 . 栈的起始地址是否总为 0x00007FFFFFFFF000，静态动态都在此处
 
-=== 装载过程
+=== ELF 执行过程
 
-在 Linux 系统中，C 语言程序的执行过程是通过操作系统提供的 C 运行库（libc）来实现的，而在这个库中，程序的入口函数是 `_start`。
-`_start` 函数实际上是 C 运行时环境的启动代码，主要的任务是初始化 C 运行时环境，并将控制权传递给 C 语言的 `main` 函数。
-当程序启动时，操作系统会把控制权交给 `_start` 函数，然后由 `_start` 函数初始化 C 运行时环境，并调用 `main` 函数，最后 `_start` 函数在 `main` 函数返回后退出程序。
+[source%nowrap,bash]
+----
+#minibash 小实验：
+make minibash.clean minibash.bin
+build/minibash.bin
+cat /etc/passwd | grep root
+sed -i 's|/bin/bash|/media/sf_learn-c/elf/build/minibash.bin|' /etc/passwd
+sed -i 's|/media/sf_learn-c/elf/build/minibash.bin|/bin/bash|' /etc/passwd
+ssh root@test-node01
 
-在 libc 中，`_start` 函数通常由汇编代码实现，其主要过程如下：
+# crtmini 小实验：
+make empty-crtnone.clean
+make empty.run SUBDIR=/empty-crtnone CRT=NONE
+make empty-crtmini.clean
+make empty.readobjbin SUBDIR=/empty-crtmini CRT=MINI
+make all-in-one.clean
+make all-in-one.run SUBDIR=/all-in-one
+make singleton-crtmini-static.clean
+make singleton.readobjbin SUBDIR=/singleton-crtmini-static CRT=MINI STATIC=-static
+make singleton.run SUBDIR=/singleton-crtmini-static CRT=MINI
+make singleton-crtmini-dynamic.clean
+make singleton.readobjbin SUBDIR=/singleton-crtmini-dynamic CRT=MINI
+make singleton.run SUBDIR=/singleton-crtmini-dynamic CRT=MINI
 
-1. 进行一些基本的初始化，例如设置堆栈指针和栈帧、清零 bss 段等。
+# 生命周期小实验：
+make init_fini.o.clean init_fini.o.readobj
+make lifecycle.clean
+make lifecycle.run OBJS=build/init_fini.o SUBDIR=/lifecycle
+----
 
-2. 调用 `__libc_start_main` 函数，这个函数将会调用程序的 `main` 函数。 `__libc_start_main` 函数的原型如下：
+=== empty.c
 
-```c
-int __libc_start_main(
-    int (*main) (int, char **, char **),
-    int argc, char **argv,
-    void (*init) (void),
-    void (*fini) (void),
-    void (*rtld_fini) (void),
-    void (*stack_end)
-);
-```
+[source%nowrap,bash]
+----
+make empty-default-static.clean
+make empty.readobjbin SUBDIR=/empty-default-static STATIC=-static V=-v
+build/empty-default-static/empty.stripped.bin
 
-其中，`main` 参数就是程序的主函数，`argc` 和 `argv` 分别表示命令行参数的数量和值，`init` 和 `fini` 是可选的函数指针，用于在程序启动和结束时执行一些初始化和清理工作，`rtld_fini` 是 ld.so (动态链接器) 用于在程序退出时清理的回调函数，最后一个参数 `stack_end` 表示当前进程的栈的结束地址。
+make empty-default-dynamic.clean
+make empty.readobjbin SUBDIR=/empty-default-dynamic V=-v
+build/empty-default-dynamic/empty.stripped.bin
 
-3. `__libc_start_main` 函数调用完 `main` 函数后，执行一些清理工作并退出程序。
+make empty-main-static.clean
+make empty.readobjbin SUBDIR=/empty-main-static CRT=NONE STATIC=-static V=-v
+build/empty-main-static/empty.stripped.bin
 
-需要注意的是，`_start` 函数不是 C 语言的 `main` 函数，因此它不能调用 C 标准库中的函数，也不能使用 C 语言的语法和数据类型，它只能使用汇编语言实现。
+make empty-main-dynamic.clean
+make empty.readobjbin SUBDIR=/empty-main-dynamic CRT=NONE V=-v
+build/empty-main-dynamic/empty.stripped.bin
 
-=== ld
+make build/empty-main-static/empty.o.size
+make build/empty-main-static/empty.stripped.bin.size
+make build/empty-main-static/empty.o.bytes START=0x80 END=0x86
+make build/empty-main-dynamic/empty.stripped.bin.size
+make build/empty-main-dynamic/empty.stripped.bin.bytes START=0x100b END=0x1f20
+make build/empty-main-static/empty.bin.maps
+make build/empty-main-static/empty.stripped.bin.maps
+# ldd build/empty-main-dynamic/empty.bin
+# ldd build/empty-crtmini-dynamic/empty.bin
+# ldd build/empty-default-dynamic/empty.bin
 
- /usr/lib/gcc/x86_64-linux-gnu/11/collect2
-    -plugin /usr/lib/gcc/x86_64-linux-gnu/11/liblto_plugin.so
-    -plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/11/lto-wrapper
-    -plugin-opt=-fresolution=/tmp/cciJaVPe.res
-    -plugin-opt=-pass-through=-lgcc
-    -plugin-opt=-pass-through=-lgcc_eh
-    -plugin-opt=-pass-through=-lc
-    --build-id -m elf_x86_64 --hash-style=gnu --as-needed -static -z relro
-    -o build/empty/static/empty.bin
-    /usr/lib/gcc/x86_64-linux-gnu/11/../../../x86_64-linux-gnu/crt1.o
-    /usr/lib/gcc/x86_64-linux-gnu/11/../../../x86_64-linux-gnu/crti.o
-    /usr/lib/gcc/x86_64-linux-gnu/11/crtbeginT.o
-    -L/usr/lib/gcc/x86_64-linux-gnu/11
-    -L/usr/lib/gcc/x86_64-linux-gnu/11/../../../x86_64-linux-gnu
-    -L/usr/lib/gcc/x86_64-linux-gnu/11/../../../../lib
-    -L/lib/x86_64-linux-gnu -L/lib/../lib
-    -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib
-    -L/usr/lib/gcc/x86_64-linux-gnu/11/../../.. build/empty/static/empty.o
-    --start-group -lgcc -lgcc_eh -lc
-    --end-group /usr/lib/gcc/x86_64-linux-gnu/11/crtend.o
-    /usr/lib/gcc/x86_64-linux-gnu/11/../../../x86_64-linux-gnu/crtn.o
+make empty-crtmini-static.clean
+make empty.readobjbin SUBDIR=/empty-crtmini-static CRT=MINI STATIC=-static V=-v
+build/empty-crtmini-static/empty.stripped.bin
 
-* frame #0: 0x0000000000401745 empty.bin`main
-frame #1: 0x0000000000401b8a empty.bin`__libc_start_call_main + 106
-frame #2: 0x00000000004033e7 empty.bin`__libc_start_main_impl + 2535
-frame #3: 0x0000000000401645 empty.bin`_start + 37
+make empty-crtmini-dynamic.clean
+make empty.readobjbin SUBDIR=/empty-crtmini-dynamic CRT=MINI V=-v
+build/empty-crtmini-dynamic/empty.stripped.bin
+----
 
+=== singleton.c
 
-== 讲解思路
+[source%nowrap,bash]
+----
+make singleton-default-static.clean
+make singleton.readobjbin SUBDIR=/singleton-default-static STATIC=-static V=-v
+build/singleton-default-static/singleton.stripped.bin
 
-. 前言
-.. 参考资料。可能有一些我觉得不重要或者疏忽的内容，读者可以自行查阅资料进行学习。
-.. 理论+实践
-.. 实验环境
-. 构建过程概述
-. 构建过程案例
-. 文件布局和文件类型
-. 静态链接
-. 动态链接
-. 重定位
+make singleton-default-dynamic.clean
+make singleton.readobjbin SUBDIR=/singleton-default-dynamic V=-v
+build/singleton-default-dynamic/singleton.stripped.bin
+----
 
 == 常见问题
 
@@ -196,10 +198,23 @@ x86-64 Linux 程序的默认起始虚拟地址是 0x00005555 54000000，也就�
 . ida 逆向工程软件，可用于分析和反汇编二进制程序，以便了解程序的内部工作方式和实现细节
 . https://stackoverflow.com/questions/64424692/how-does-the-address-of-r-x86-64-plt32-computed[尽管重新定位条目的类型是R_X86_64_PLT32，但链接器仍将使用R_X86_64_PC32^]
 
-=== 调试
+=== ld
 
-对于编译时没有调试信息的程序，调试时可以执行到方法级别即 next 会跳转到下一个方法调用处，但无法按汇编语句执行。
-ida 可支持逐汇编语句调试（据说，尚未验证）。
+.静态链接命令
+[source%nowrap,bash]
+----
+include::example$elf/ld.static.txt[]
+----
+
+.动态链接命令
+[source%nowrap,bash]
+----
+include::example$elf/ld.dynamic.txt[]
+----
+
+这个命令是一个用于链接目标文件的命令，将目标文件链接成一个可执行文件。
+该命令的参数非常多，其中包括链接器的选项、链接库的路径、输入文件的路径等等。
+该命令使用的链接器是 collect2，用于将目标文件链接成一个可执行文件。
 
 === readelf
 
@@ -366,3 +381,4 @@ cat build/empty.maps \
 # 从反编译文件中，筛选出方法名
 grep '>:' build/empty.bin.objdump > analysis/empty.bin.objdump.function
 ----
+

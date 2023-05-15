@@ -1,0 +1,17 @@
+= Graffle 导出图
+
+== AT&T汇编语言基础
+
+image::graffle/AT&T汇编语言基础.png[]
+
+== C 语言可变参数实现原理
+
+image::graffle/可变参数实现原理.png[]
+
+== ELF 可执行文件的运行过程
+
+image::graffle/可执行文件的运行过程.png[]
+
+== ELF 静态虚拟地址空间
+
+image::graffle/静态虚拟地址空间.png[]

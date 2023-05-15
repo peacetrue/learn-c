@@ -14,50 +14,6 @@
 . https://sourceware.org/binutils/docs/
 . https://sourceware.org/binutils/docs/as/index.html[GAS^]
 
-== 案例
-
-源代码：
-
-.empty.cpp
-[source%nowrap,cpp]
-----
-include::example$src/elf/cpp/empty.cpp[]
-----
-
-汇编代码 AT&T 风格：
-
-.empty.s
-[source%nowrap,s]
-----
-include::example$src/elf/analysis/empty.syntax.s[]
-----
-
-.empty.s
-[source%nowrap,bash]
-----
-#正常构建
-make clean build/empty.s
-make build/empty.o.readelf build/empty.o.comment build/empty.bin build/empty.bin.readelf
-build/empty.bin
-
-#删除附加内容
-sed '/.file/d;/.LF/d;/.cfi/d;/.size/d;/.ident/,$d' build/empty.s > build/empty.tiny.s
-make build/empty.tiny.o.readelf build/empty.tiny.o.comment  build/empty.tiny.bin build/empty.tiny.bin.readelf
-build/empty.tiny.bin
-----
-
-.更多测试
-[source%nowrap,bash]
-----
-#是否还能更精简
-sed '/.globl/d;' build/empty.tiny.s > build/empty.bad.s
-make build/empty.bad.o.readelf build/empty.bad.bin.readelf
-
-#可执行栈
-sed 's/.note.GNU-stack,""/.note.GNU-stack,"x"/g' build/empty.s > build/empty.stack.s
-make build/empty.stack.o.readelf build/empty.stack.bin.readelf
-----
-
 === cfi
 
 .参考
