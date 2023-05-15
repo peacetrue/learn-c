@@ -16,7 +16,7 @@ TEST(Preprocessor, function) {
     EXPECT_EQ(4, SQUARE(2));
 
 #define MAX(x, y) ((x)>(y)?(x):(y))
-    EXPECT_EQ(4, MAX(3 + 2, 4 + 2));
+    EXPECT_EQ(6, MAX(3 + 2, 4 + 2));
 }
 
 
