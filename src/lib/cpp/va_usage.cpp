@@ -4,7 +4,7 @@
 #include "va_usage.h"
 
 //@formatter:off
-long va_sum_gcc(long padding1, long padding2, long count, ...) {
+long va_sum_glibc(long padding1, long padding2, long count, ...) {
     long sum = 0;
     va_list ap;
     va_start(ap, count);
