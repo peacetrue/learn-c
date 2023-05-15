@@ -1,0 +1,33 @@
+/usr/lib/gcc/x86_64-linux-gnu/11/collect2 \
+-plugin /usr/lib/gcc/x86_64-linux-gnu/11/liblto_plugin.so \
+-plugin-opt=/usr/lib/gcc/x86_64-linux-gnu/11/lto-wrapper \
+-plugin-opt=-fresolution=/tmp/ccEJtciD.res \
+-plugin-opt=-pass-through=-lgcc \
+-plugin-opt=-pass-through=-lgcc_eh \
+-plugin-opt=-pass-through=-lc \
+--build-id \
+-m elf_x86_64 \
+--hash-style=gnu \
+--as-needed \
+-static \
+-z relro \
+-o build/singleton-crtmini-static/singleton.bin \
+/usr/lib/gcc/x86_64-linux-gnu/11/../../../x86_64-linux-gnu/crt1.o \
+/usr/lib/gcc/x86_64-linux-gnu/11/../../../x86_64-linux-gnu/crti.o \
+/usr/lib/gcc/x86_64-linux-gnu/11/crtbeginT.o \
+-L/usr/lib/gcc/x86_64-linux-gnu/11 \
+-L/usr/lib/gcc/x86_64-linux-gnu/11/../../../x86_64-linux-gnu \
+-L/usr/lib/gcc/x86_64-linux-gnu/11/../../../../lib \
+-L/lib/x86_64-linux-gnu \
+-L/lib/../lib \
+-L/usr/lib/x86_64-linux-gnu \
+-L/usr/lib/../lib \
+-L/usr/lib/gcc/x86_64-linux-gnu/11/../../.. \
+build/singleton-crtmini-static/singleton.o \
+--start-group \
+-lgcc \
+-lgcc_eh \
+-lc \
+--end-group \
+/usr/lib/gcc/x86_64-linux-gnu/11/crtend.o \
+/usr/lib/gcc/x86_64-linux-gnu/11/../../../x86_64-linux-gnu/crtn.o
