@@ -13,7 +13,7 @@ struct va_list_tag {
  * @param ... 可变参数
  * @return 和
  */
-long va_sum_gcc(long padding1, long padding2,
+long va_sum_glibc(long padding1, long padding2,
                 long count, ...);
 
 /**
@@ -33,7 +33,7 @@ long va_sum_custom(long padding1, long padding2,
  * @return 和
  */
 long
-va_sum_gcc7(long padding1, long padding2, long padding3, long padding4, long padding5, long padding6, long padding7,
+va_sum_glibc7(long padding1, long padding2, long padding3, long padding4, long padding5, long padding6, long padding7,
             long count, ...);
 
 /**
