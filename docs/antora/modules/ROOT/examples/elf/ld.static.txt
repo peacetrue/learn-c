@@ -11,7 +11,7 @@
 --as-needed \
 -static \
 -z relro \
--o build/singleton-crtmini-static/singleton.bin \
+-o build/singleton-custom-static/singleton.bin \
 /usr/lib/gcc/x86_64-linux-gnu/11/../../../x86_64-linux-gnu/crt1.o \
 /usr/lib/gcc/x86_64-linux-gnu/11/../../../x86_64-linux-gnu/crti.o \
 /usr/lib/gcc/x86_64-linux-gnu/11/crtbeginT.o \
@@ -23,7 +23,7 @@
 -L/usr/lib/x86_64-linux-gnu \
 -L/usr/lib/../lib \
 -L/usr/lib/gcc/x86_64-linux-gnu/11/../../.. \
-build/singleton-crtmini-static/singleton.o \
+build/singleton-custom-static/singleton.o \
 --start-group \
 -lgcc \
 -lgcc_eh \

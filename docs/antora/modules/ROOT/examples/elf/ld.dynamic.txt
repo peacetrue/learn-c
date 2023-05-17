@@ -16,7 +16,7 @@
   -pie \
   -z now \
   -z relro \
-  -o build/singleton-crtmini-dynamic/singleton.bin \
+  -o build/singleton-custom-dynamic/singleton.bin \
   /usr/lib/gcc/x86_64-linux-gnu/11/../../../x86_64-linux-gnu/Scrt1.o \
   /usr/lib/gcc/x86_64-linux-gnu/11/../../../x86_64-linux-gnu/crti.o \
   /usr/lib/gcc/x86_64-linux-gnu/11/crtbeginS.o \
@@ -28,7 +28,7 @@
   -L/usr/lib/x86_64-linux-gnu \
   -L/usr/lib/../lib \
   -L/usr/lib/gcc/x86_64-linux-gnu/11/../../.. \
-  build/singleton-crtmini-dynamic/singleton.o \
+  build/singleton-custom-dynamic/singleton.o \
   -lgcc \
   --push-state \
   --as-needed \

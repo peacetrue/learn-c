@@ -25,7 +25,7 @@ void exit_mini(int exit_code) {
 
 /** ld 默认的入口函数。*/
 void _start() {
-    if (!&main)exit_mini(1);
+    if (!&main)exit_mini(0);
     char *rbp_ptr = 0;
     __asm("mov %%rbp,%0":"=r"(rbp_ptr));
     int exit_code = main(*(rbp_ptr + 8), (char **) (rbp_ptr + 16));

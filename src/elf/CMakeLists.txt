@@ -1,8 +1,8 @@
+add_executable(elf_offset c/elf_offset.c)
 add_executable(empty c/empty.c)
 add_executable(sleep c/sleep.c)
-add_executable(elf_offset c/elf_offset.c)
 add_executable(minibash c/minibash.c)
-add_executable(singleton c/singleton.c)
+add_executable(variable c/variable.c)
 
 add_library(log_lib c/log_lib.c c/log_lib.h)
 add_executable(log_main_debug c/log_main_debug.c c/log_lib.h)

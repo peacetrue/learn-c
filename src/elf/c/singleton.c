@@ -1,42 +1,33 @@
-/** 独立案例，用于分析变量在汇编及 ELF 中的表示 */
-#include <stdio.h>
+/** 演示不依赖 crt 和 libc 的程序 */
+const char *const str = "Hello world!\n";
 
-// 值类型
-int global_init_var = 1; // 全局 初始化 变量
-int global_unin_var;     // 全局 未初始 变量
-static int static_init_var = 2; // 静态 初始化 变量
-static int static_unin_var;     // 静态 未初始 变量
-//数组类型（结构体同理），仅使用 全局 初始化 变量
-char global_init_var_chars[] = "number";
-const char *global_init_var_chars_ptr = &global_init_var_chars[3];
-int global_init_var_ints[] = {1, 2, 3, 4, 5};
-int *global_init_var_ints_ptr = &global_init_var_ints[3];
-
-void global_print(int number) {
-    printf("%s=%d\n", global_init_var_chars, number);
+/**
+ * int write(int filedesc, char* buffer, int size);
+ * WRITE 调用的调用号为 4，则 eax = 0。 filedesc 表示被写入的文件句柄，使用ebx寄存器传递，我们这里是要往
+ * 默认终端(stdout)输出，它的文件句柄为0，即ebx = 0。 buffer表示要写入的缓冲区地址，使用ecx寄存器传递，我们这里要输出
+ * 字符串str，所以ecx = str。
+ * size 表示要写入的字节数，使用edx寄存器传递，字符串“Hello
+ * world!\n”长度为13字节，所以edx = 13。
+ */
+void print() {
+    __asm("movl $13,%%edx \n\t"
+          "movq %0,%%rcx  \n\t"
+          "movl $0,%%ebx  \n\t"
+          "movl $4,%%eax  \n\t"
+          "int $0x80      \n\t"
+            ::"r"(str):"edx", "ecx", "ebx");
 }
 
-static void static_print(int number) {
-    printf("%s=%d\n", global_init_var_chars_ptr, number);
+/**
+ * EXIT 系统调用中，ebx 表示进程退出码(Exit Code)。
+ */
+void exit() {
+    __asm("movl $0,%ebx  \n\t"
+          "movl $1,%eax  \n\t"
+          "int $0x80\n\t");
 }
 
-int main() {
-    static int static_init_var_m = 3; // 静态 初始化 变量 方法内
-    static int static_unin_var_m;     // 静态 未初始 变量 方法内
-
-    int local_init_var = 4; // 本地 初始化 变量
-    int local_unin_var;     // 本地 未初始 变量
-
-    int sum = global_init_var
-              + global_unin_var
-              + static_init_var
-              + static_unin_var
-              + static_init_var_m
-              + static_unin_var_m
-              + local_init_var
-              + local_unin_var;
-
-    global_print(sum);
-    static_print(sum);
+void nomain() {
+    print();
+    exit();
 }
-

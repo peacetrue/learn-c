@@ -99,19 +99,19 @@ make empty-crtnone.clean
 make empty.run SUBDIR=/empty-crtnone CRT=NONE
 make empty-crtmini.clean
 make empty.readobjbin SUBDIR=/empty-crtmini CRT=MINI
-make all-in-one.clean
-make all-in-one.run SUBDIR=/all-in-one
-make singleton-crtmini-static.clean
-make singleton.readobjbin SUBDIR=/singleton-crtmini-static CRT=MINI STATIC=-static
-make singleton.run SUBDIR=/singleton-crtmini-static CRT=MINI
-make singleton-crtmini-dynamic.clean
-make singleton.readobjbin SUBDIR=/singleton-crtmini-dynamic CRT=MINI
-make singleton.run SUBDIR=/singleton-crtmini-dynamic CRT=MINI
+make singleton.clean
+make singleton.run SUBDIR=/singleton
+make singleton-custom-static.clean
+make singleton.readobjbin SUBDIR=/singleton-custom-static CRT=MINI STATIC=-static
+make singleton.run SUBDIR=/singleton-custom-static CRT=MINI
+make singleton-custom-dynamic.clean
+make singleton.readobjbin SUBDIR=/singleton-custom-dynamic CRT=MINI
+make singleton.run SUBDIR=/singleton-custom-dynamic CRT=MINI
 
 # 生命周期小实验：
 make init_fini.o.clean init_fini.o.readobj
 make lifecycle.clean
-make lifecycle.run OBJS=build/init_fini.o SUBDIR=/lifecycle
+make lifecycle.run DEPENDENCE=build/init_fini.o SUBDIR=/lifecycle
 ----
 
 === empty.c
@@ -126,32 +126,32 @@ make empty-default-dynamic.clean
 make empty.readobjbin SUBDIR=/empty-default-dynamic V=-v
 build/empty-default-dynamic/empty.stripped.bin
 
-make empty-main-static.clean
-make empty.readobjbin SUBDIR=/empty-main-static CRT=NONE STATIC=-static V=-v
-build/empty-main-static/empty.stripped.bin
+make empty-none-static.clean
+make empty.readobjbin SUBDIR=/empty-none-static CRT=NONE STATIC=-static V=-v
+build/empty-none-static/empty.stripped.bin
 
-make empty-main-dynamic.clean
-make empty.readobjbin SUBDIR=/empty-main-dynamic CRT=NONE V=-v
-build/empty-main-dynamic/empty.stripped.bin
+make empty-none-dynamic.clean
+make empty.readobjbin SUBDIR=/empty-none-dynamic CRT=NONE V=-v
+build/empty-none-dynamic/empty.stripped.bin
 
-make build/empty-main-static/empty.o.size
-make build/empty-main-static/empty.stripped.bin.size
-make build/empty-main-static/empty.o.bytes START=0x80 END=0x86
-make build/empty-main-dynamic/empty.stripped.bin.size
-make build/empty-main-dynamic/empty.stripped.bin.bytes START=0x100b END=0x1f20
-make build/empty-main-static/empty.bin.maps
-make build/empty-main-static/empty.stripped.bin.maps
-# ldd build/empty-main-dynamic/empty.bin
-# ldd build/empty-crtmini-dynamic/empty.bin
+make build/empty-none-static/empty.o.size
+make build/empty-none-static/empty.stripped.bin.size
+make build/empty-none-static/empty.o.bytes START=0x80 END=0x86
+make build/empty-none-dynamic/empty.stripped.bin.size
+make build/empty-none-dynamic/empty.stripped.bin.bytes START=0x100b END=0x1f20
+make build/empty-none-static/empty.bin.maps
+make build/empty-none-static/empty.stripped.bin.maps
+# ldd build/empty-none-dynamic/empty.bin
+# ldd build/empty-custom-dynamic/empty.bin
 # ldd build/empty-default-dynamic/empty.bin
 
-make empty-crtmini-static.clean
-make empty.readobjbin SUBDIR=/empty-crtmini-static CRT=MINI STATIC=-static V=-v
-build/empty-crtmini-static/empty.stripped.bin
+make empty-custom-static.clean
+make empty.readobjbin SUBDIR=/empty-custom-static CRT=MINI STATIC=-static V=-v
+build/empty-custom-static/empty.stripped.bin
 
-make empty-crtmini-dynamic.clean
-make empty.readobjbin SUBDIR=/empty-crtmini-dynamic CRT=MINI V=-v
-build/empty-crtmini-dynamic/empty.stripped.bin
+make empty-custom-dynamic.clean
+make empty.readobjbin SUBDIR=/empty-custom-dynamic CRT=MINI V=-v
+build/empty-custom-dynamic/empty.stripped.bin
 ----
 
 === singleton.c
