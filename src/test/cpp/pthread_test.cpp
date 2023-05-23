@@ -7,7 +7,7 @@ TEST(pthread, pthread_create_usage) {
 }
 
 
-/*
+/**
  * 线程专有数据（Thread-Specific Data，TSD）的缩写，
  * 它是多线程编程中的一个重要概念。
  * TSD 允许程序员为每个线程关联一些私有数据，
@@ -35,8 +35,7 @@ TEST(pthread, tsd) {
     }
 }
 
-
-/*
+/**
  * 线程局部存储（TLS，Thread Local Storage）。
  */
 static __thread int tls_flag = 0;
