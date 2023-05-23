@@ -29,3 +29,25 @@ TEST(SYNTAX, TEMPLATE) {
     double x = 3.4, y = 2.1;
     ASSERT_EQ(x, template_max<double>(x, y));
 }
+
+
+/** 联合体 */
+TEST(SYNTAX, UNION) {
+    union quantity {
+        short count;
+        float weight;
+        float volume;
+    };
+    union quantity q{};
+    ASSERT_EQ(NULL, q.count);
+    ASSERT_EQ(NULL, q.weight);
+    ASSERT_EQ(NULL, q.volume);
+    q.count = 4;
+    ASSERT_EQ(4, q.count);
+    ASSERT_NE(NULL, q.weight);
+    ASSERT_NE(NULL, q.volume);
+    q = {.weight=5};
+    ASSERT_EQ(5, q.weight);
+    ASSERT_NE(4, q.count);
+    ASSERT_NE(NULL, q.volume);
+}
