@@ -51,3 +51,32 @@ TEST(SYNTAX, UNION) {
     ASSERT_NE(4, q.count);
     ASSERT_NE(NULL, q.volume);
 }
+
+
+/** 常量字段。 */
+TEST(SYNTAX, CONST) {
+    int init_int = 1;
+    init_int = 2;
+
+    const int init_const_int = 2;
+//    init_const_int = 3; // Cannot assign to variable 'init_const_int' with const-qualified type 'const int'
+
+    int const init_int_const = 2; //没有错误但不推荐
+//    init_int_const = 2; // Cannot assign to variable 'init_int_const' with const-qualified type 'const int'
+
+    int *init_int_prt = &init_int;
+    init_int_prt = &init_int;
+    *init_int_prt = 2;
+
+    const int *init_const_int_prt = &init_int;
+    init_const_int_prt = &init_int;
+//    *init_const_int_prt = 2; // Read-only variable is not assignable
+
+    int const *init_int_const_prt = &init_int;
+    init_int_const_prt = &init_int;
+//    *init_int_const_prt = 2; // Read-only variable is not assignable
+
+    int *const init_int_prt_const = &init_int;
+//    init_int_prt_const = &init_int; // Cannot assign to variable 'init_int_prt_const' with const-qualified type 'int *const'
+    *init_int_prt_const = 2;
+}
