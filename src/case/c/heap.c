@@ -8,7 +8,7 @@ long resolveArg(int argc, char **argv, int index, long defaults) {
 }
 
 /**
- * 观察堆内存。
+ * 使用不同的方式分配虚拟内存，然后睡眠数秒，此时使用命令观察虚拟内存分布情况。
  *
  * @param argc 参数数目
  * @param argv 参数指针。

@@ -34,15 +34,16 @@ $(BUILD)/%.top: $(BUILD)/%.pid
 	top -b -e m -n 1 -p `cat $<` > $@
 $(BUILD)/%.pmap: $(BUILD)/%.pid
 	pmap `cat $<` > $@
-$(BUILD)/%.maps: $(BUILD)/%.pid
+# 此处理想的后缀名为 maps，为了兼容 graffle 自动化时选择文件改成了 maps.txt
+$(BUILD)/%.maps.txt: $(BUILD)/%.pid
 	cat /proc/`cat $<`/maps > $@
 # 分析应用程序堆内存
-heap.case: $(BUILD)/heap.top $(BUILD)/heap.pmap $(BUILD)/heap.maps $(BUILD)/heap.trace.mini;
+heap.case: $(BUILD)/heap.top $(BUILD)/heap.pmap $(BUILD)/heap.maps.txt $(BUILD)/heap.trace.mini;
 heap_subdir_prefix:=/heap
 heap_seconds:=1
 heap_sleep_seconds:=1
 heap.cases:
-	make clean heap.case SUBDIR=$(heap_subdir_prefix)-0 ARGS=0
+	make clean heap.case SUBDIR=$(heap_subdir_prefix)-0 ARGS='0 0 $(heap_seconds)'
 	sleep $(heap_sleep_seconds)
 	make clean heap.case SUBDIR=$(heap_subdir_prefix)-10-mmap ARGS='10 1 $(heap_seconds)'
 	sleep $(heap_sleep_seconds)
