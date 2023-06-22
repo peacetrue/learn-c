@@ -7,6 +7,7 @@ $(BUILD)/%.run: $(BUILD)/%.bin$(STRIPPED)
 $(BUILD)/%.lldb: $(BUILD)/%.bin$(STRIPPED)
 	lldb $<
 #生成内存映射文件。ps -f 选项展示 CMD 全部内容，默认会截断 CMD 名称。make build/empty.bin.maps
+#生成内存映射文件。ps -f 选项展示 CMD 全部内容，默认会截断 CMD 名称。make build/singleton-none-static/singleton.bin.stripped.maps  SUBDIR=/singleton-none-static
 $(BUILD)/%.maps:
 #	cat /proc/`ps -a | grep "$*" | head -n 1 | awk '{printf $$1}'`/maps > $@
 	cat /proc/`ps -af | grep -E "elf.*$*" | head -n 1 | awk '{printf $$2}'`/maps > $@

@@ -54,8 +54,8 @@ $(BUILD)/%.so.stripped: $(BUILD)/%.so
 	objcopy $(addprefix --remove-section , $(SO_SECTIONS)) $< $@
 # .gnu.version_r：包含符号版本的相关信息，用于动态链接器加载共享库时进行符号解析。
 # ELF load command address/offset not page-aligned
-# unsupported version 0 of Verneed record
-SECTIONS=$(SO_SECTIONS) .gnu.hash .gnu.version .gnu.version_r .eh_frame_hdr .eh_frame
+# unsupported version 0 of Verneed record .gnu.version_r
+SECTIONS=$(SO_SECTIONS) .gnu.hash .gnu.version .eh_frame_hdr .eh_frame
 $(BUILD)/%.stripped: $(BUILD)/%
 	objcopy $(addprefix --remove-section , $(SECTIONS)) $< $@
 

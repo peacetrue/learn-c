@@ -16,10 +16,10 @@ C_LIB_PATH:=$(if $(C_LIB),$(shell pwd)/$(C_LIB).$(LIB_SUFFIX)$(STRIPPED),)
 
 ifneq ($(or $(ENTRY_OPT),$(CUS_LIB)),)
 $(BUILD)/%.so: $(BUILD)/%.o$(STRIPPED)
-	ld $(CFLAGS) -shared $(PIC_OPT) -o $@ $(if $(filter $*,libmini),,$(C_LIB_PATH)) $<
+	ld -z norelro $(CFLAGS) -shared $(PIC_OPT) -o $@ $(if $(filter $*,libmini),,$(C_LIB_PATH)) $<
 #$(BUILD)/%.bin: $(BUILD)/%.o build/crtmini.o 此写法因为依赖项多出一个 crtmini.o，导致优先级较低，无法覆盖先前的定义
 $(BUILD)/%.bin: $(BUILD)/%.o$(STRIPPED) $(DEPENDENCE)
 #   添加一个 make 命令，手动构建依赖项。$(BUILD) 作为占位命令，当 CRT_READOBJ 和 C_READOBJ 都为空时有效
 	make $(MAKEFLAGS) $(CRT_READOBJ) $(C_READOBJ) $(BUILD)
-	ld $(V) $(STATIC_OPT) $(DYNAMIC_OPT) $(ENTRY_OPT) -o $@ $(CRT_LIB_PATH) $(C_LIB_PATH) $^
+	ld -z norelro $(V) $(STATIC_OPT) $(DYNAMIC_OPT) $(ENTRY_OPT) -o $@ $(CRT_LIB_PATH) $(C_LIB_PATH) $^
 endif
