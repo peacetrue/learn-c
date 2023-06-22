@@ -154,17 +154,17 @@ make empty.readobjbin SUBDIR=/empty-custom-dynamic CRT=MINI V=-v
 build/empty-custom-dynamic/empty.stripped.bin
 ----
 
-=== singleton.c
+=== variable.c
 
 [source%nowrap,bash]
 ----
-make singleton-default-static.clean
-make singleton.readobjbin SUBDIR=/singleton-default-static STATIC=-static V=-v
-build/singleton-default-static/singleton.stripped.bin
+make variable-default-static.clean
+make variable.readobjbin SUBDIR=/variable-default-static STATIC=-static V=-v
+build/variable-default-static/variable.stripped.bin
 
-make singleton-default-dynamic.clean
-make singleton.readobjbin SUBDIR=/singleton-default-dynamic V=-v
-build/singleton-default-dynamic/singleton.stripped.bin
+make variable-default-dynamic.clean
+make variable.readobjbin SUBDIR=/variable-default-dynamic V=-v
+build/variable-default-dynamic/variable.stripped.bin
 ----
 
 == 常见问题
@@ -349,6 +349,7 @@ echo "ibase=16; obase=16; A + 6" | bc # 16
 
 #还原小端序字符串
 echo -n "64656d2f732f6169656c5f662d6e7261" | sed -E 's/(..)/\1 /g' | tac -s ' ' | sed 's/ //g;$a\'
+sysctl -n hw.memsize | awk '{ printf "%.2f GiB\n", $1 / (1024^3) }'
 ----
 
 === 在 Shell 中执行内存换算

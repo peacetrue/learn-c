@@ -2,8 +2,12 @@
 
 == 参考
 
-== 术语
+. https://en.cppreference.com/[C++ 官网^]
+. https://itanium-cxx-abi.github.io/cxx-abi/abi.html[Itanium C++ ABI^（GCC）]
+. https://www.gnu.org/[GNU^]
+. https://sourceware.org/[Free the Software^]
 
+== 术语
 
 == 文件类型
 
@@ -72,7 +76,6 @@ gdb main
 参考 https://www.jetbrains.com/zh-cn/clion/features/unit-testing.html[CLion 单元测试^]。
 
 https://github.com/google/googletest[Google Test^]
-
 
 == 附录
 
