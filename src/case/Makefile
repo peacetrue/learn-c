@@ -20,6 +20,10 @@ all: init elf
 close_rvs:
 	sysctl -w kernel.randomize_va_space=0
 	sysctl -a | grep kernel.randomize_va_space
+$(BUILD)/%.i: c/%.c $(BUILD)
+	gcc $(CFLAGS) -E -o $@ $<
+$(BUILD)/%.i: cpp/%.cpp $(BUILD)
+	gcc $(CFLAGS) -E -o $@ $<
 $(BUILD)/%.bin: c/%.c $(BUILD)
 	gcc $(CFLAGS) -o $@ $<
 $(BUILD)/%.bin: cpp/%.cpp $(BUILD)
@@ -55,7 +59,4 @@ heap.cases:
 	sleep $(heap_sleep_seconds)
 	make clean heap.case SUBDIR=$(heap_subdir_prefix)-malloc-2-10 ARGS='3 2 10 $(heap_seconds)'
 
-
-# ./build/reorder-O0.bin
-# ./build/reorder-O1-volatile.bin
-# ./build/reorder-O1.bin
+preprocess.case: $(BUILD)/preprocess.i;
