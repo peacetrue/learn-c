@@ -1,19 +1,9 @@
 # https://www.gnu.org/software/make/manual/html_node/Options-Summary.html
+SRC:=src
 SUBDIR:=#在子目录下构建时使用，默认为空格，设置时需要以 / 起始，例如：SUBDIR=/dynamic
 BUILD:=build$(SUBDIR)#设置构建目录
 #删除 BUILD 中的空格，避免执行 clean 时，误删根目录。如果传入 SUBDIR=' / sub'，则删除命令为 rm -rf build / sub，结果很惨烈，好在是虚拟机
 BUILD:=$(shell echo "$(BUILD)" | tr -d ' ')
-
-#编译选项
-CFLAGS:=
-V:=#-v
-CFLAGS+=$(V)#输出详细的编译信息
-
-# make 命令选项
-MAKEFLAGS:=
-#MAKEFLAGS+=-s#静默模式，
-#MAKEFLAGS+=--debug
-MAKEFLAGS+=--no-print-directory#屏蔽输出 make[1]: Entering directory '/media/sf_learn-c/elf'
 
 ################# 基础配置 #################
 .SECONDARY:#保留中间过程文件
@@ -29,6 +19,8 @@ $(BUILD):
 # 此目标无依赖，优先级很高，会取代其他有依赖的任务，不能使用
 #$(BUILD)/%:
 #	mkdir -p $@
+$(BUILD)/%.id: $(BUILD)
+	mkdir -p $@
 mkdir/%:
 	mkdir -p $(BUILD)/$*
 #删除构建目录。make clean

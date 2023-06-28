@@ -267,13 +267,13 @@ breakpoint read my_breakpoints.json
 #运行程序
 run
 #查看线程列表
-thread list
+handle_thread list
 #切换到指定线程
-thread select 1
+handle_thread select 1
 #线程回溯。例如 -s 来显示帧的源代码，-f 来显示完整函数名称等
-thread backtrace
+handle_thread backtrace
 #当前栈帧信息
-frame info
+handle_frame info
 #查看变量
 print
 #看当前函数的汇编代码

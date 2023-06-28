@@ -20,43 +20,64 @@ all: init elf
 close_rvs:
 	sysctl -w kernel.randomize_va_space=0
 	sysctl -a | grep kernel.randomize_va_space
+CFLAGS:=-g
 $(BUILD)/%.i: c/%.c $(BUILD)
 	gcc $(CFLAGS) -E -o $@ $<
 $(BUILD)/%.i: cpp/%.cpp $(BUILD)
 	gcc $(CFLAGS) -E -o $@ $<
+$(BUILD)/%.s: c/%.c $(BUILD)
+	gcc $(CFLAGS) -S -o $@ $<
+$(BUILD)/%.s: cpp/%.cpp $(BUILD)
+	gcc $(CFLAGS) -S -o $@ $<
 $(BUILD)/%.bin: c/%.c $(BUILD)
 	gcc $(CFLAGS) -o $@ $<
 $(BUILD)/%.bin: cpp/%.cpp $(BUILD)
 	gcc $(CFLAGS) -o $@ $<
-exec/%: $(BUILD)/%.bin
-	$< $(ARGS) > $(BUILD)/$*.log &
-$(BUILD)/%.trace: $(BUILD)/%.bin
-	strace -o $@ $< $(ARGS)
+
+EXEC_EXTENSION=.bin
+include ../elf/run.mk
 $(BUILD)/%.trace.mini: $(BUILD)/%.trace
 	cat $< | sed -n '/write(1, "way:/,/write(1, "buffer location:/p' > $@
 #	cat $< | grep -A 3 'write(1, "size: ' > $@
-$(BUILD)/%.pid: exec/%
-	ps -a | grep "$*" | grep -v "grep" | head -n 1 | awk '{print $$1}' > $@
-# top 分析内存  -e M
-$(BUILD)/%.top: $(BUILD)/%.pid
-	top -b -e m -n 1 -p `cat $<` > $@
-$(BUILD)/%.pmap: $(BUILD)/%.pid
-	pmap `cat $<` > $@
-# 此处理想的后缀名为 maps，为了兼容 graffle 自动化时选择文件改成了 maps.txt
-$(BUILD)/%.maps.txt: $(BUILD)/%.pid
-	cat /proc/`cat $<`/maps > $@
-# 分析应用程序堆内存
-heap.case: $(BUILD)/heap.trace.mini $(BUILD)/heap.top $(BUILD)/heap.pmap $(BUILD)/heap.maps.txt;
-heap_subdir_prefix:=/heap
-heap_seconds:=1
-heap_sleep_seconds:=$(shell expr $(heap_seconds) \* 2)
-heap.cases:
-	make clean heap.case SUBDIR=$(heap_subdir_prefix)-0 ARGS='0 0 0 $(heap_seconds)'
-	sleep $(heap_sleep_seconds)
-	make clean heap.case SUBDIR=$(heap_subdir_prefix)-brk-2-10 ARGS='1 2 10 $(heap_seconds)'
-	sleep $(heap_sleep_seconds)
-	make clean heap.case SUBDIR=$(heap_subdir_prefix)-mmap-2-10 ARGS='2 2 10 $(heap_seconds)'
-	sleep $(heap_sleep_seconds)
-	make clean heap.case SUBDIR=$(heap_subdir_prefix)-malloc-2-10 ARGS='3 2 10 $(heap_seconds)'
 
+# 分析应用程序堆内存
+heap_subdir:=/heap
+heap_time:=2
+heap_size:=10
+heap_seconds:=1
+heap.case: $(BUILD)/heap.trace.mini $(BUILD)/heap.top $(BUILD)/heap.pmap $(BUILD)/heap.maps.head $(BUILD)/heap.so.ls stop/heap;
+heap.cases:
+	@for way in $(shell seq 0 3); do \
+	    make clean heap.case SUBDIR=$(heap_subdir)-$$way-$(heap_time)-$(heap_size)-$(heap_seconds) ARGS="$$way $(heap_time) $(heap_size) $(heap_seconds)";\
+    done
+#	make clean heap.case SUBDIR=$(heap_subdir_prefix)-0 ARGS='0 0 0 $(heap_seconds)'
+#	make clean heap.case SUBDIR=$(heap_subdir_prefix)-brk-2-10 ARGS='1 2 10 $(heap_seconds)'
+#	make clean heap.case SUBDIR=$(heap_subdir_prefix)-mmap-2-10 ARGS='2 2 10 $(heap_seconds)'
+#	make clean heap.case SUBDIR=$(heap_subdir_prefix)-malloc-2-10 ARGS='3 2 10 $(heap_seconds)'
+
+# 执行 graffle 堆内存绘图
+graffle_dir:=$(workingDir)/learn-graffle/automation
+heap.graffle.cases:
+	@for way in $(shell seq 0 3); do \
+	    make -C $(graffle_dir) demo-memory.call.case script_argument=$(shell pwd)/$(BUILD)$(heap_subdir)-$$way-$(heap_time)-$(heap_size)-$(heap_seconds)/heap.maps.txt;\
+    done
+#	make -C $(graffle_dir) demo-memory.call.case script_argument=$(shell pwd)/$(BUILD)/heap-0/heap.maps.txt
+#	make -C $(graffle_dir) demo-memory.call.case script_argument=$(shell pwd)/$(BUILD)/heap-brk-2-10/heap.maps.txt
+#	make -C $(graffle_dir) demo-memory.call.case script_argument=$(shell pwd)/$(BUILD)/heap-mmap-2-10/heap.maps.txt
+#	make -C $(graffle_dir) demo-memory.call.case script_argument=$(shell pwd)/$(BUILD)/heap-malloc-2-10/heap.maps.txt
+
+#分析预处理过程。
 preprocess.case: $(BUILD)/preprocess.i;
+
+#分析类型转换实现原理。内存中小端序，寄存器中低位对应内存中低位，eax 截取 rax 的低位部分，最终得到低位部分值
+type_cast.case: $(BUILD)/type_cast.source $(BUILD)/type_cast.bin $(BUILD)/type_cast.s
+	lldb -b -s $< -- $(word 2, $^)
+$(BUILD)/type_cast.source:
+	echo "breakpoint set --all-files -p 'printf\\(\"long'" > $@
+	echo "run" >> $@
+	echo "x/8b &var_long" >> $@
+	echo "x/2w &var_long" >> $@
+	echo "x/1g &var_long" >> $@
+	echo "reg read rax" >> $@
+	echo "reg read eax" >> $@
+	echo "c" >> $@

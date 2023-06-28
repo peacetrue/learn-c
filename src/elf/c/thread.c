@@ -4,13 +4,13 @@
 #include <pthread.h>
 
 static void *thread_func2(void *arg) {
-    printf("peer thread 2: %lu\n", pthread_self());
+    printf("peer handle_thread 2: %lu\n", pthread_self());
     sleep(10);
     return arg;
 }
 
 static void *thread_func(void *arg) {
-    printf("peer thread: %lu\n", pthread_self());
+    printf("peer handle_thread: %lu\n", pthread_self());
 
     pthread_t thread;
     pthread_create(&thread, NULL, thread_func2, arg);
@@ -21,7 +21,7 @@ static void *thread_func(void *arg) {
 }
 
 int main(int argc, char **argv) {
-    printf("main thread: %lu\n", pthread_self());
+    printf("main handle_thread: %lu\n", pthread_self());
 
     pthread_t thread;
     pthread_create(&thread, NULL, thread_func, &argc);

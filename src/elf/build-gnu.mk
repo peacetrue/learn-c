@@ -1,7 +1,18 @@
+#编译选项
+CFLAGS:=
+V:=#-v
+CFLAGS+=$(V)#输出详细的编译信息
+
+# make 命令选项
+MAKEFLAGS:=
+#MAKEFLAGS+=-s#静默模式，
+#MAKEFLAGS+=--debug
+MAKEFLAGS+=--no-print-directory#屏蔽输出 make[1]: Entering directory '/media/sf_learn-c/elf'
+
 ################# 构建相关 #################
 PIC_OPT:=$(if $(PIC),-fPIC,)#位置无关代码
 STATIC_OPT:=$(if $(STATIC),-static,)#静态链接
-STRIPPED:=.stripped#是否启用 stripped 模式，剥离汇编、二进制文件中无关内容。默认启用
+STRIPPED=.stripped#是否启用 stripped 模式，剥离汇编、二进制文件中无关内容。默认启用
 DEPENDENCE:=#生成 bin 时的依赖文件
 #生成汇编文件，支持 c、cpp 源文件
 #-fno-builtin#禁用内建函数内联优化，例如：将无参的 printf 替换为 puts
@@ -21,9 +32,11 @@ $(BUILD)/%.a: $(BUILD)/%.o$(STRIPPED)
 #生成动态链接库文件，-shared 表示产生共享对象
 $(BUILD)/%.so: $(BUILD)/%.o$(STRIPPED)
 	gcc $(CFLAGS) -shared $(PIC_OPT) -o $@ $<
-#生成可执行文件
+#生成可执行文件，-lstdc++ 支持 c++ new
 $(BUILD)/%.bin: $(BUILD)/%.o$(STRIPPED) $(DEPENDENCE)
-	gcc $(CFLAGS) $(STATIC_OPT) -o $@ $^
+	gcc $(CFLAGS) $(STATIC_OPT) -o $@ $^ -lstdc++
+#	gcc $(CFLAGS) $(STATIC_OPT) -lstdc++ -o $@ $^ # 反例，-lstdc++ 的位置错误
+#	g++ $(CFLAGS) $(STATIC_OPT) -o $@ $^ # 另一种可选的途径
 # 生成 elf 解析文件
 $(BUILD)/%.readelf: $(BUILD)/%$(STRIPPED)
 #   true 防止 readelf 返回非 0 状态导致 make 警告

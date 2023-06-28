@@ -53,6 +53,8 @@ namespace learn {
 
         /**
          * 观察对方。
+         * 当您将一个成员函数声明为 const 时，它表示该函数不会对类的成员变量进行修改。
+         * 这有助于提高代码的可读性和安全性，并允许在 const 对象和 const 引用上调用该函数。
          * @param person 对方
          */
         void observe(const Person &person) const;

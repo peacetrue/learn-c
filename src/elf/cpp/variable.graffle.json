@@ -1,0 +1,15 @@
+{
+  "size": 96,
+  "blocks": [
+    {"description": "%rbp", "startAddress": 0},
+    {"description": "%rbx", "startAddress": -8},
+    {"description": "long unin_long;", "startAddress": -16},
+    {"description": "const long init_long = 140;", "startAddress": -24},
+    {"description": "Classes unin_classes;", "startAddress": -64, "size": 16},
+    {"description": "Classes init_classes(120, 130);", "startAddress": -80, "size": 16},
+    {"description": "Classes init_classes_value = init_classes;", "startAddress": -96, "size": 16},
+    {"description": "Classes &init_classes_ref = init_classes;", "startAddress": -32},
+    {"description": "Classes *init_classes_ptr = &init_classes;", "startAddress": -40},
+    {"description": "Classes *init_classes_ptr_dyn = new Classes(1, 2);", "startAddress": -48}
+  ]
+}
