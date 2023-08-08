@@ -1,0 +1,8 @@
+breakpoint set -f type_cast.c -p 'printf\("long'
+run
+x/8b &var_long
+x/2w &var_long
+x/1g &var_long
+reg read rax
+reg read eax
+c

@@ -14,13 +14,19 @@ PIC_OPT:=$(if $(PIC),-fPIC,)#位置无关代码
 STATIC_OPT:=$(if $(STATIC),-static,)#静态链接
 STRIPPED=.stripped#是否启用 stripped 模式，剥离汇编、二进制文件中无关内容。默认启用
 DEPENDENCE:=#生成 bin 时的依赖文件
+$(BUILD)/%.i: c/%.c $(BUILD)
+	gcc $(CFLAGS) -E -o $@ $<
+$(BUILD)/%.i: cpp/%.cpp $(BUILD)
+	gcc $(CFLAGS) -E -o $@ $<
 #生成汇编文件，支持 c、cpp 源文件
 #-fno-builtin#禁用内建函数内联优化，例如：将无参的 printf 替换为 puts
 #-fno-stack-protector#防止生成 __stack_chk_fail 调用
-$(BUILD)/%.s: c/%.c $(BUILD)
+$(BUILD)/%.s: $(BUILD)/%.i
 	cc $(CFLAGS) -fno-builtin -fno-stack-protector $(PIC_OPT) -S -o $@ $<
-$(BUILD)/%.s: cpp/%.cpp $(BUILD)
-	cc $(CFLAGS) -fno-builtin -fno-stack-protector $(PIC_OPT) -S -o $@ $<
+#$(BUILD)/%.s: c/%.c $(BUILD)
+#	cc $(CFLAGS) -fno-builtin -fno-stack-protector $(PIC_OPT) -S -o $@ $<
+#$(BUILD)/%.s: cpp/%.cpp $(BUILD)
+#	cc $(CFLAGS) -fno-builtin -fno-stack-protector $(PIC_OPT) -S -o $@ $<
 #生成对象文件，支持从源目录或者构建目录读取汇编文件
 $(BUILD)/%.o: s/%.s $(BUILD)#此处不需要 $(STRIPPED)
 	as $(CFLAGS) -c -o $@ $<

@@ -1,4 +1,4 @@
-# https://www.gnu.org/software/make/manual/html_node/Options-Summary.html
+# https://www.gnu.org/software/make/manual/make.html
 SRC:=src
 SUBDIR:=#在子目录下构建时使用，默认为空格，设置时需要以 / 起始，例如：SUBDIR=/dynamic
 BUILD:=build$(SUBDIR)#设置构建目录
@@ -19,8 +19,6 @@ $(BUILD):
 # 此目标无依赖，优先级很高，会取代其他有依赖的任务，不能使用
 #$(BUILD)/%:
 #	mkdir -p $@
-$(BUILD)/%.id: $(BUILD)
-	mkdir -p $@
 mkdir/%:
 	mkdir -p $(BUILD)/$*
 #删除构建目录。make clean

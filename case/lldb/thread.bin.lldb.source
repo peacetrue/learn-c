@@ -1,0 +1,4 @@
+breakpoint set -f thread.c -p 'return arg;'
+r
+shell sleep 2
+c

@@ -1,4 +1,4 @@
-#include <printf.h>
+#include <stdio.h>
 
 /**
  * 类型转换，long 转换为 int，溢出值如何处理。

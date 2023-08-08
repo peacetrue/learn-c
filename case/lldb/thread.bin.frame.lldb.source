@@ -1,0 +1,21 @@
+command script import lldb/dump.py
+settings set target.env-vars COMMAND_OUTPUT_DIR=build
+
+# settings set frame-format "frame #${frame.index}: ${frame.pc} ${frame.fp}~${frame.sp} { ${module.file.basename}`${function.name}{${function.pc-offset}}}{ at ${line.file.basename}:${line.number}}\n"
+settings set frame-format '\{"startAddress": "${frame.sp}", "endAddress": "${frame.fp}", "description": "${module.file.basename}`${function.name}" \}\n'
+
+breakpoint set -f thread.c -p 'return arg;'
+r
+
+# mac: shell sh -c "ps | grep thread.bin | grep -v grep | grep -v lldb | awk '{print $$1}' "
+# linux
+dump -f thread.bin.maps -- shell ps | grep thread.bin | grep -v grep | grep -v lldb | awk '{print \$1}' | xargs -I {} cat /proc/{}/maps
+
+# 当前处于线程 2
+dump -f thread.bin[2].frames -- bt
+
+thread select 1
+# 当前处于线程 1
+dump -f thread.bin[1].frames -- bt
+
+c
